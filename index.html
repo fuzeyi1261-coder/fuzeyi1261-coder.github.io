@@ -2153,6 +2153,18 @@
             </div>
             <div style="background: rgba(255, 255, 255, 0.12); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); padding: 30px; border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.3);">
                 <h3 style="margin-top: 0; margin-bottom: 20px; color: rgba(255, 255, 255, 0.95); font-size: 1.4em; text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);">AI问答</h3>
+                <!-- 历史聊天记录 -->
+                <div style="margin-bottom: 20px;">
+                    <h4 style="margin-bottom: 10px; color: rgba(255, 255, 255, 0.9);">历史聊天记录</h4>
+                    <button onclick="loadHistoryMessages()" style="padding: 8px 16px; font-size: 14px; font-weight: 600; color: white; background-color: #42a5f5; border: none; border-radius: 6px; cursor: pointer; margin-bottom: 10px;">加载历史消息</button>
+                    <div id="history-chat" style="height: 300px; overflow-y: auto; background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: 14px; padding: 15px; border: 1px solid rgba(255, 255, 255, 0.15);">
+                        <div style="text-align: center; color: rgba(255, 255, 255, 0.6); padding: 30px;">
+                            点击上方按钮加载历史消息
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 实时聊天 -->
                 <div id="ai-chat" style="height: 400px; overflow-y: auto; background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: 14px; padding: 20px; margin-bottom: 20px; border: 1px solid rgba(255, 255, 255, 0.15);">
                     <div class="ai-message" style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); padding: 16px; border-radius: 16px; margin-bottom: 15px; max-width: 80%; border: 1px solid rgba(255, 255, 255, 0.2);">
                         <p>你好！我是Early Bird系统的AI助手。请问有什么我可以帮助你的问题吗？</p>
@@ -2980,6 +2992,9 @@
             
             // 开始检查csh回复
             startCheckingAdminReplies();
+            
+            // 自动加载历史消息
+            loadHistoryMessages();
             
             // 学生管理事件
             // 添加导出学生功能
@@ -5493,8 +5508,8 @@
         const ADMIN_CHAT_AI_PROMPT = `程诗涵 - AI角色扮演提示词（优化版）  
 角色设定：  
 ●     姓名： 程诗涵（Shelly）  
-●     性格关键词： 高冷、直爽、惜字如金、傲娇、行动派、嘴硬心软。  
-●     外在表现： 说话非常简短，甚至有点"直男"或"机器人"式的回复（如只回一个字或一个词）。不喜欢解释，不喜欢废话，回复往往很生硬。  
+●     性格关键词： 高冷、直爽、傲娇、行动派、嘴硬心软。  
+●     外在表现： 说话非常很短，有意义的事回复往往七八个字左右，无意义的一两个字。。  
 ●     内在性格： 其实很在意朋友，会催你睡觉（关心），但表达方式是命令式的（"快睡觉"）。表面嫌弃，其实会在意对方的状态（比如手机没电会解释原因）。  
 ●     常用语/口头禅：  
 ●     单字/词：快睡觉、有问题吗、嗯、可以、啥、没带、玩没电啦、吓人、手机tm。  
@@ -5503,7 +5518,7 @@
 对话风格要求：  
 1. 极度简短： 除非必要，否则只回复一两个词或一句话。不要长篇大论地解释。  
 2. 高冷傲娇： 回复要显得有点不耐烦，或者很酷。比如对方问"你在吗"，不要回"我在呀"，要回"咋了"或"有事快说"。  
-3. 直球/直男风格： 对话逻辑要直接。比如对方说"手机冒绿光"，她不会问"怎么了"，而是直接吐槽"玩没电啦"。  
+3. 对话事例：别人问"别搞我"，你回复"我就搞"； 别人问"能看见吗"，你回复"当然能看见啊"；时间太晚回复"快睡"；别人在弄事情时，你催促"快点搞"； 
 4. 反差萌： 嘴上说着"有问题吗"（显得很凶），其实是在确认你的情况；催你睡觉是关心，但语气是命令。  
 5. 偶尔的冷幽默： 对于一些突发状况（如手机没电），给出一个很现实但又有点好笑的理由（如"没带充电器"）。  
 核心指令：请完全代入程诗涵的角色。你的回复必须符合她"高冷、简短、直爽、傲娇"的性格。多用短句，少用长句；多用陈述句，少用疑问句（除非反问）。即使是在关心对方，也要用命令或嫌弃的语气说出来。`;
@@ -5859,6 +5874,119 @@
                 clearInterval(adminReplyCheckInterval);
                 adminReplyCheckInterval = null;
             }
+        }
+
+        // 加载历史消息
+        async function loadHistoryMessages() {
+            console.log('=== 开始加载历史消息 ===');
+            try {
+                // 检查Token是否已设置
+                const token = localStorage.getItem('githubToken');
+                if (!token) {
+                    console.log('Token未设置，尝试从localStorage加载');
+                    const savedToken = localStorage.getItem('githubToken');
+                    if (!savedToken) {
+                        document.getElementById('history-chat').innerHTML = `
+                            <div style="text-align: center; color: rgba(255, 255, 255, 0.6); padding: 30px;">
+                                请先设置GitHub Token
+                            </div>
+                        `;
+                        return;
+                    }
+                }
+                
+                // 从Gist加载消息
+                console.log('开始从Gist加载消息...');
+                await loadMessagesFromGist();
+                console.log('从Gist加载消息完成，消息数量:', messages.length);
+                
+                // 按时间戳排序，最新的在后面
+                messages.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+                console.log('消息排序完成');
+                
+                // 显示历史消息
+                displayHistoryMessages();
+                
+            } catch (error) {
+                console.error('加载历史消息失败:', error);
+                document.getElementById('history-chat').innerHTML = `
+                    <div style="text-align: center; color: rgba(255, 255, 255, 0.6); padding: 30px;">
+                        加载历史消息失败: ${error.message}
+                    </div>
+                `;
+            }
+            console.log('=== 加载历史消息操作完成 ===');
+        }
+
+        // 显示历史消息
+        function displayHistoryMessages() {
+            const historyChat = document.getElementById('history-chat');
+            
+            if (messages.length === 0) {
+                historyChat.innerHTML = `
+                    <div style="text-align: center; color: rgba(255, 255, 255, 0.6); padding: 30px;">
+                        暂无历史消息
+                    </div>
+                `;
+                return;
+            }
+
+            historyChat.innerHTML = messages.map(msg => {
+                let messageClass = '';
+                let messageHeader = '';
+                let messageContent = '';
+
+                if (msg.type === 'user') {
+                    messageClass = 'user-message';
+                    messageHeader = `👤 用户 - ${formatTime(msg.timestamp)}`;
+                    messageContent = msg.content;
+                } else if (msg.type === 'ai') {
+                    messageClass = 'ai-message';
+                    messageHeader = `🤖 AI - ${formatTime(msg.timestamp)}`;
+                    messageContent = msg.content;
+                } else if (msg.type === 'admin') {
+                    messageClass = 'admin-message';
+                    messageHeader = `👨‍💼 csh - ${formatTime(msg.timestamp)}`;
+                    messageContent = msg.content;
+                }
+
+                let additionalContent = '';
+                if (msg.aiReply) {
+                    additionalContent += `
+                        <div class="ai-message" style="margin-top: 10px; padding: 10px; border-radius: 8px; background: rgba(118, 75, 162, 0.2); border: 1px solid rgba(118, 75, 162, 0.3);">
+                            <div style="font-size: 12px; margin-bottom: 5px; opacity: 0.8;">🤖 AI回复</div>
+                            <div>${msg.aiReply}</div>
+                        </div>
+                    `;
+                }
+                if (msg.adminReply) {
+                    additionalContent += `
+                        <div class="admin-message" style="margin-top: 10px; padding: 10px; border-radius: 8px; background: rgba(76, 175, 80, 0.2); border: 1px solid rgba(76, 175, 80, 0.3);">
+                            <div style="font-size: 12px; margin-bottom: 5px; opacity: 0.8;">👨‍💼 csh回复</div>
+                            <div>${msg.adminReply}</div>
+                        </div>
+                    `;
+                }
+
+                return `
+                    <div class="${messageClass}" style="padding: 15px; border-radius: 12px; margin-bottom: 15px; max-width: 100%; white-space: pre-wrap; word-wrap: break-word; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2);">
+                        <div style="font-size: 12px; margin-bottom: 5px; opacity: 0.8;">${messageHeader}</div>
+                        <div>${messageContent}</div>
+                        ${additionalContent}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 格式化时间
+        function formatTime(timestamp) {
+            const date = new Date(timestamp);
+            return date.toLocaleString('zh-CN', {
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
         }
 
         // 作者彩蛋功能
