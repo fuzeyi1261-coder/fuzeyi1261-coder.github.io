@@ -333,6 +333,36 @@
                 </div>
 
                 <div class="input-group">
+                    <label>GitHub Token</label>
+                    <input type="password" id="github-token" placeholder="输入GitHub Personal Access Token">
+                    <button class="btn btn-primary" onclick="
+                        console.log('=== 直接保存Token ===');
+                        const token = document.getElementById('github-token').value.trim();
+                        console.log('输入的Token:', token);
+                        if (token) {
+                            localStorage.setItem('githubToken', token);
+                            console.log('Token已保存:', localStorage.getItem('githubToken'));
+                            if (typeof gistConfig !== 'undefined') {
+                                gistConfig.token = token;
+                                console.log('gistConfig已更新');
+                            }
+                            // 显示通知
+                            const notification = document.createElement('div');
+                            notification.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #4CAF50; color: white; padding: 15px; border-radius: 8px; z-index: 10000; transition: all 0.3s ease; transform: translateX(400px);';
+                            notification.textContent = 'GitHub Token已保存！';
+                            document.body.appendChild(notification);
+                            setTimeout(() => notification.style.transform = 'translateX(0)', 100);
+                            setTimeout(() => {
+                                notification.style.transform = 'translateX(400px)';
+                                setTimeout(() => notification.remove(), 300);
+                            }, 3000);
+                        } else {
+                            alert('请输入GitHub Token');
+                        }
+                    " style="margin-top: 10px;">保存Token</button>
+                </div>
+
+                <div class="input-group">
                     <label>当前选中消息</label>
                     <div id="selected-message" style="background: rgba(255, 255, 255, 0.1); padding: 15px; border-radius: 12px; margin-bottom: 15px;">
                         <span style="color: rgba(255, 255, 255, 0.6);">未选择消息</span>
@@ -360,8 +390,9 @@
 
     <script>
         // 消息存储
-        let messages = JSON.parse(localStorage.getItem('adminChatMessages') || '[]');
         let selectedMessageId = null;
+        // 使用firebase-config.js中定义的messages变量，不再重新定义
+        console.log('使用全局messages变量:', typeof messages);
 
         // AI角色提示词
         const AI_PROMPT = `程诗涵 - AI角色扮演提示词（优化版）  
@@ -384,6 +415,19 @@
 
         // 页面加载时初始化
         document.addEventListener('DOMContentLoaded', () => {
+            // 从本地存储加载Token
+            const savedToken = localStorage.getItem('githubToken');
+            if (savedToken) {
+                const githubTokenInput = document.getElementById('github-token');
+                if (githubTokenInput) {
+                    githubTokenInput.value = savedToken;
+                }
+                // 更新 gistConfig.token
+                if (typeof gistConfig !== 'undefined') {
+                    gistConfig.token = savedToken;
+                }
+            }
+            
             loadMessages();
             updatePendingCount();
             
@@ -392,20 +436,163 @@
                 loadMessages();
             }, 5000);
         });
+        
+        // 保存GitHub Token
+        function saveGitHubToken() {
+            console.log('=== 开始保存Token ===');
+            
+            // 检查localStorage是否可用
+            try {
+                localStorage.setItem('test', 'test');
+                localStorage.removeItem('test');
+                console.log('localStorage可用');
+            } catch (e) {
+                console.error('localStorage不可用:', e);
+                showNotification('错误：浏览器阻止了本地存储，请检查浏览器设置', 'error');
+                return;
+            }
+            
+            // 获取Token输入框
+            const tokenInput = document.getElementById('github-token');
+            console.log('Token输入框:', tokenInput);
+            
+            if (!tokenInput) {
+                console.error('无法找到ID为github-token的元素');
+                showNotification('错误：无法找到Token输入框', 'error');
+                return;
+            }
+            
+            // 获取输入的Token
+            const token = tokenInput.value.trim();
+            console.log('输入的Token长度:', token.length);
+            console.log('输入的Token前20字符:', token.substring(0, 20) + (token.length > 20 ? '...' : ''));
+            
+            if (!token) {
+                console.log('未输入Token');
+                showNotification('请输入GitHub Token', 'error');
+                return;
+            }
+            
+            // 保存Token到localStorage
+            try {
+                localStorage.setItem('githubToken', token);
+                console.log('Token已保存到localStorage');
+                
+                // 验证保存是否成功
+                const savedToken = localStorage.getItem('githubToken');
+                console.log('保存后的Token长度:', savedToken ? savedToken.length : 0);
+                
+                if (savedToken) {
+                    console.log('保存验证成功');
+                } else {
+                    console.error('保存验证失败');
+                    showNotification('错误：Token保存失败，请重试', 'error');
+                    return;
+                }
+                
+                // 更新 gistConfig.token
+                if (typeof gistConfig !== 'undefined') {
+                    gistConfig.token = token;
+                    console.log('gistConfig.token已更新');
+                } else {
+                    console.error('gistConfig未定义');
+                }
+                
+                // 显示成功提示
+                showNotification('GitHub Token已保存！', 'success');
+                console.log('保存成功提示已显示');
+                
+            } catch (e) {
+                console.error('保存Token时出错:', e);
+                showNotification('错误：保存Token时出错，请重试', 'error');
+            }
+            
+            console.log('=== 保存Token操作完成 ===');
+        }
+        
+        // 显示通知函数
+        function showNotification(message, type) {
+            // 创建通知元素
+            const notification = document.createElement('div');
+            
+            // 设置样式
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                border-radius: 8px;
+                z-index: 10000;
+                font-size: 16px;
+                font-weight: 600;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+                transition: all 0.3s ease;
+                transform: translateX(400px);
+            `;
+            
+            // 根据类型设置不同样式
+            if (type === 'success') {
+                notification.style.backgroundColor = '#4CAF50';
+                notification.style.color = 'white';
+            } else if (type === 'error') {
+                notification.style.backgroundColor = '#f44336';
+                notification.style.color = 'white';
+            } else {
+                notification.style.backgroundColor = '#2196F3';
+                notification.style.color = 'white';
+            }
+            
+            // 设置消息内容
+            notification.textContent = message;
+            
+            // 添加到页面
+            document.body.appendChild(notification);
+            
+            // 显示动画
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+            
+            // 3秒后隐藏
+            setTimeout(() => {
+                notification.style.transform = 'translateX(400px)';
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 3000);
+        }
 
         // 加载消息
         async function loadMessages() {
+            console.log('=== 开始加载消息 ===');
             try {
+                // 检查Token是否已设置
+                const token = localStorage.getItem('githubToken');
+                console.log('Token状态:', token ? '已设置' : '未设置');
+                
+                if (!token) {
+                    console.error('Token未设置，无法加载消息');
+                    showNotification('错误：请先设置GitHub Token', 'error');
+                    return;
+                }
+                
                 // 从Gist加载消息
+                console.log('开始从Gist加载消息...');
                 await loadMessagesFromGist();
+                console.log('从Gist加载消息完成，消息数量:', messages.length);
                 
                 // 按时间戳排序，最新的在后面
                 messages.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+                console.log('消息排序完成');
+                
             } catch (error) {
                 console.error('加载消息失败:', error);
+                showNotification('错误：加载消息失败，请检查控制台', 'error');
             }
+            console.log('开始渲染消息，消息数量:', messages.length);
             renderMessages();
             updatePendingCount();
+            console.log('=== 加载消息操作完成 ===');
         }
 
         // 渲染消息列表

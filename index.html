@@ -2158,6 +2158,11 @@
                         <p>你好！我是Early Bird系统的AI助手。请问有什么我可以帮助你的问题吗？</p>
                     </div>
                 </div>
+                <!-- GitHub Token设置 -->
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <input type="password" id="github-token" placeholder="输入GitHub Personal Access Token" style="flex: 1; padding: 12px 16px; font-size: 16px; border: 2px solid #e0e7ff; border-radius: 8px; outline: none;">
+                    <button onclick="saveGitHubToken()" style="padding: 12px 24px; font-size: 16px; font-weight: 600; color: white; background-color: #42a5f5; border: none; border-radius: 8px; cursor: pointer;">保存Token</button>
+                </div>
                 <div style="display: flex; gap: 10px;">
                     <input type="text" id="ai-question" placeholder="输入你的问题..." style="flex: 1; padding: 12px 16px; font-size: 16px; border: 2px solid #e0e7ff; border-radius: 8px; outline: none;">
                     <button id="ai-submit-btn" style="padding: 12px 24px; font-size: 16px; font-weight: 600; color: white; background-color: #42a5f5; border: none; border-radius: 8px; cursor: pointer;">发送</button>
@@ -3015,8 +3020,28 @@
 
             // 更新提示事件
             updateConfirmBtn.addEventListener('click', closeUpdateModal);
+            
+            // 检查GitHub Token
+            const tokenSaved = loadTokenFromLocalStorage();
+            if (tokenSaved) {
+                const githubTokenInput = document.getElementById('github-token');
+                if (githubTokenInput) {
+                    githubTokenInput.value = localStorage.getItem('githubToken');
+                }
+            }
 
         });
+        
+        // 保存GitHub Token
+        function saveGitHubToken() {
+            const token = document.getElementById('github-token').value.trim();
+            if (token) {
+                saveTokenToLocalStorage(token);
+                alert('GitHub Token已保存！');
+            } else {
+                alert('请输入GitHub Token');
+            }
+        }
 
         // 更新提示相关函数
         function checkFirstVisit() {
