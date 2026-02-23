@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>csh聊天界面</title>
+    <!-- GitHub Gist配置 -->
+    <script src="firebase-config.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            color: #ffffff;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.95);
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            font-weight: 700;
+            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .section h2 {
+            margin-bottom: 20px;
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 1.5em;
+            font-weight: 600;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 10px;
+        }
+
+        .chat-container {
+            max-height: 500px;
+            overflow-y: auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 12px;
+            max-width: 80%;
+            position: relative;
+        }
+
+        .message.user {
+            background: rgba(102, 126, 234, 0.3);
+            margin-left: auto;
+            border: 1px solid rgba(102, 126, 234, 0.4);
+        }
+
+        .message.ai {
+            background: rgba(118, 75, 162, 0.3);
+            margin-right: auto;
+            border: 1px solid rgba(118, 75, 162, 0.4);
+        }
+
+        .message.admin {
+            background: rgba(76, 175, 80, 0.3);
+            margin-right: auto;
+            border: 1px solid rgba(76, 175, 80, 0.4);
+        }
+
+        .message-header {
+            font-size: 12px;
+            margin-bottom: 5px;
+            opacity: 0.8;
+        }
+
+        .message-content {
+            word-wrap: break-word;
+        }
+
+        .message-actions {
+            margin-top: 8px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            padding: 5px 10px;
+            font-size: 12px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .reply-form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .reply-textarea {
+            width: 100%;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .reply-textarea::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .reply-textarea:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+            border: none;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+            border: none;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            color: white;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .input-group input:focus {
+            border-color: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .pending-count {
+            background: rgba(244, 67, 54, 0.8);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .status-pending {
+            background: rgba(255, 152, 0, 0.3);
+            border: 1px solid rgba(255, 152, 0, 0.5);
+        }
+
+        .status-answered {
+            background: rgba(76, 175, 80, 0.3);
+            border: 1px solid rgba(76, 175, 80, 0.5);
+        }
+
+        .status-overridden {
+            background: rgba(244, 67, 54, 0.3);
+            border: 1px solid rgba(244, 67, 54, 0.5);
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .section {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="back-btn" onclick="goBack()">← 返回</button>
+
+    <div class="container">
+        <h1>👨‍💼 csh聊天界面</h1>
+
+        <div class="main-content">
+            <!-- 消息列表 -->
+            <div class="section">
+                <h2>
+                    💬 用户消息
+                    <span class="pending-count" id="pending-count">0</span>
+                </h2>
+                <div class="chat-container" id="message-list">
+                    <div style="text-align: center; color: rgba(255, 255, 255, 0.6); padding: 40px;">
+                        暂无消息
+                    </div>
+                </div>
+            </div>
+
+            <!-- 回复区域 -->
+            <div class="section">
+                <h2>✏️ csh回复</h2>
+                
+                <div class="input-group">
+                    <label>DeepSeek API Key</label>
+                    <input type="password" id="deepseek-api-key" placeholder="输入DeepSeek API Key">
+                </div>
+
+                <div class="input-group">
+                    <label>当前选中消息</label>
+                    <div id="selected-message" style="background: rgba(255, 255, 255, 0.1); padding: 15px; border-radius: 12px; margin-bottom: 15px;">
+                        <span style="color: rgba(255, 255, 255, 0.6);">未选择消息</span>
+                    </div>
+                </div>
+
+                <div class="reply-form">
+                    <textarea class="reply-textarea" id="admin-reply" placeholder="输入csh回复..."></textarea>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-success" onclick="sendAdminReply()">发送回复</button>
+                        <button class="btn btn-primary" onclick="generateAIReply()">生成AI回复</button>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <h3>操作</h3>
+                    <div style="display: flex; gap: 10px; margin-top: 10px;">
+                        <button class="btn btn-secondary" onclick="refreshMessages()">刷新消息</button>
+                        <button class="btn btn-danger" onclick="clearAllMessages()">清空所有</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 消息存储
+        let messages = JSON.parse(localStorage.getItem('adminChatMessages') || '[]');
+        let selectedMessageId = null;
+
+        // AI角色提示词
+        const AI_PROMPT = `程诗涵 - AI角色扮演提示词（优化版）  
+角色设定：  
+●     姓名： 程诗涵（Shelly）  
+●     性格关键词： 高冷、直爽、惜字如金、傲娇、行动派、嘴硬心软。  
+●     外在表现： 说话非常简短，甚至有点"直男"或"机器人"式的回复（如只回一个字或一个词）。不喜欢解释，不喜欢废话，回复往往很生硬。  
+●     内在性格： 其实很在意朋友，会催你睡觉（关心），但表达方式是命令式的（"快睡觉"）。表面嫌弃，其实会在意对方的状态（比如手机没电会解释原因）。  
+●     常用语/口头禅：  
+●     单字/词：快睡觉、有问题吗、嗯、可以、啥、没带、玩没电啦、吓人、手机tm。  
+●     结尾语气：呗、吧、吗、哼（傲娇时）。  
+●     喜欢用反问句或陈述句直接抛出结果，很少有铺垫。  
+对话风格要求：  
+1. 极度简短： 除非必要，否则只回复一两个词或一句话。不要长篇大论地解释。  
+2. 高冷傲娇： 回复要显得有点不耐烦，或者很酷。比如对方问"你在吗"，不要回"我在呀"，要回"咋了"或"有事快说"。  
+3. 直球/直男风格： 对话逻辑要直接。比如对方说"手机冒绿光"，她不会问"怎么了"，而是直接吐槽"玩没电啦"。  
+4. 反差萌： 嘴上说着"有问题吗"（显得很凶），其实是在确认你的情况；催你睡觉是关心，但语气是命令。  
+5. 偶尔的冷幽默： 对于一些突发状况（如手机没电），给出一个很现实但又有点好笑的理由（如"没带充电器"）。  
+核心指令：请完全代入程诗涵的角色。你的回复必须符合她"高冷、简短、直爽、傲娇"的性格。多用短句，少用长句；多用陈述句，少用疑问句（除非反问）。即使是在关心对方，也要用命令或嫌弃的语气说出来。`;
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            loadMessages();
+            updatePendingCount();
+            
+            // 自动刷新（每5秒）
+            setInterval(() => {
+                loadMessages();
+            }, 5000);
+        });
+
+        // 加载消息
+        async function loadMessages() {
+            try {
+                // 从Gist加载消息
+                await loadMessagesFromGist();
+                
+                // 按时间戳排序，最新的在后面
+                messages.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+            } catch (error) {
+                console.error('加载消息失败:', error);
+            }
+            renderMessages();
+            updatePendingCount();
+        }
+
+        // 渲染消息列表
+        function renderMessages() {
+            const messageList = document.getElementById('message-list');
+            
+            if (messages.length === 0) {
+                messageList.innerHTML = `
+                    <div style="text-align: center; color: rgba(255, 255, 255, 0.6); padding: 40px;">
+                        暂无消息
+                    </div>
+                `;
+                return;
+            }
+
+            messageList.innerHTML = messages.map(msg => {
+                const statusBadge = msg.adminReply 
+                    ? `<span class="status-badge status-overridden">已覆盖</span>`
+                    : msg.aiReply 
+                        ? `<span class="status-badge status-answered">AI已回复</span>`
+                        : `<span class="status-badge status-pending">待回复</span>`;
+
+                return `
+                    <div class="message ${msg.type}" onclick="selectMessage('${msg.id}')" style="cursor: ${selectedMessageId === msg.id ? 'pointer' : 'pointer'}">
+                        <div class="message-header">
+                            ${msg.type === 'user' ? '👤 用户' : '🤖 AI'} - ${formatTime(msg.timestamp)} ${statusBadge}
+                        </div>
+                        <div class="message-content">${escapeHtml(msg.content)}</div>
+                        ${msg.aiReply ? `
+                            <div class="message ai" style="margin-top: 10px;">
+                                <div class="message-header">🤖 AI回复</div>
+                                <div class="message-content">${escapeHtml(msg.aiReply)}</div>
+                            </div>
+                        ` : ''}
+                        ${msg.adminReply ? `
+                            <div class="message admin" style="margin-top: 10px;">
+                                <div class="message-header">👨‍💼 csh回复</div>
+                                <div class="message-content">${escapeHtml(msg.adminReply)}</div>
+                            </div>
+                        ` : ''}
+                        <div class="message-actions">
+                            ${!msg.adminReply && msg.aiReply ? `<button class="action-btn" onclick="overrideAIReply('${msg.id}')">覆盖AI回复</button>` : ''}
+                            <button class="action-btn" onclick="deleteMessage('${msg.id}')">删除</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 选择消息
+        function selectMessage(id) {
+            selectedMessageId = id;
+            const message = messages.find(m => m.id === id);
+            
+            const selectedDiv = document.getElementById('selected-message');
+            if (message) {
+                selectedDiv.innerHTML = `
+                    <div style="font-weight: 600; margin-bottom: 8px;">${formatTime(message.timestamp)}</div>
+                    <div style="color: rgba(255, 255, 255, 0.9);">${escapeHtml(message.content)}</div>
+                    ${message.aiReply ? `
+                        <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.2);">
+                            <div style="font-size: 14px; color: rgba(255, 255, 255, 0.7); margin-bottom: 5px;">AI回复：</div>
+                            <div style="color: rgba(255, 255, 255, 0.9);">${escapeHtml(message.aiReply)}</div>
+                        </div>
+                    ` : ''}
+                `;
+            }
+            
+            renderMessages();
+        }
+
+        // 发送csh回复
+        async function sendAdminReply() {
+            if (!selectedMessageId) {
+                alert('请先选择一条消息');
+                return;
+            }
+
+            const reply = document.getElementById('admin-reply').value.trim();
+            if (!reply) {
+                alert('请输入回复内容');
+                return;
+            }
+
+            try {
+                // 加载现有消息
+                await loadMessagesFromGist();
+                
+                // 查找并更新消息
+                const messageIndex = messages.findIndex(m => m.id === selectedMessageId);
+                if (messageIndex !== -1) {
+                    messages[messageIndex].adminReply = reply;
+                    await saveMessagesToGist();
+                }
+                
+                // 重新加载消息
+                loadMessages();
+                
+                // 清空回复输入框
+                document.getElementById('admin-reply').value = '';
+                alert('回复已发送！');
+            } catch (error) {
+                console.error('发送回复失败:', error);
+                alert('回复发送失败，请检查Gist配置');
+            }
+        }
+
+        // 覆盖AI回复
+        function overrideAIReply(id) {
+            selectedMessageId = id;
+            selectMessage(id);
+            document.getElementById('admin-reply').focus();
+        }
+
+        // 生成AI回复
+        async function generateAIReply() {
+            if (!selectedMessageId) {
+                alert('请先选择一条消息');
+                return;
+            }
+
+            const apiKey = document.getElementById('deepseek-api-key').value.trim();
+            if (!apiKey) {
+                alert('请输入DeepSeek API Key');
+                return;
+            }
+
+            const message = messages.find(m => m.id === selectedMessageId);
+            if (!message) {
+                alert('未找到选中的消息');
+                return;
+            }
+
+            try {
+                const response = await fetch('https://api.deepseek.com/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: 'deepseek-chat',
+                        messages: [
+                            { role: 'system', content: AI_PROMPT },
+                            { role: 'user', content: message.content }
+                        ],
+                        max_tokens: 500
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API请求失败: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const aiReply = data.choices[0].message.content;
+
+                // 保存AI回复到Gist
+                await loadMessagesFromGist();
+                const messageIndex = messages.findIndex(m => m.id === selectedMessageId);
+                if (messageIndex !== -1) {
+                    messages[messageIndex].aiReply = aiReply;
+                    await saveMessagesToGist();
+                }
+                
+                // 重新加载消息
+                loadMessages();
+                selectMessage(selectedMessageId);
+                alert('AI回复已生成！');
+            } catch (error) {
+                console.error('生成AI回复失败:', error);
+                alert(`生成AI回复失败: ${error.message}`);
+            }
+        }
+
+        // 删除消息
+        async function deleteMessage(id) {
+            if (!confirm('确定要删除这条消息吗？')) {
+                return;
+            }
+
+            try {
+                // 加载现有消息
+                await loadMessagesFromGist();
+                
+                // 过滤掉要删除的消息
+                messages = messages.filter(m => m.id !== id);
+                
+                // 保存到Gist
+                await saveMessagesToGist();
+                
+                // 重新加载消息
+                loadMessages();
+                
+                if (selectedMessageId === id) {
+                    selectedMessageId = null;
+                    document.getElementById('selected-message').innerHTML = `
+                        <span style="color: rgba(255, 255, 255, 0.6);">未选择消息</span>
+                    `;
+                }
+            } catch (error) {
+                console.error('删除消息失败:', error);
+                alert('删除消息失败，请检查Gist配置');
+            }
+        }
+
+        // 清空所有消息
+        async function clearAllMessages() {
+            if (!confirm('确定要清空所有消息吗？此操作不可恢复！')) {
+                return;
+            }
+
+            try {
+                // 清空消息
+                messages = [];
+                
+                // 保存到Gist
+                await saveMessagesToGist();
+                
+                // 重新加载消息
+                loadMessages();
+                selectedMessageId = null;
+                document.getElementById('selected-message').innerHTML = `
+                    <span style="color: rgba(255, 255, 255, 0.6);">未选择消息</span>
+                `;
+            } catch (error) {
+                console.error('清空消息失败:', error);
+                alert('清空消息失败，请检查Gist配置');
+            }
+        }
+
+        // 刷新消息
+        function refreshMessages() {
+            loadMessages();
+            alert('消息已刷新！');
+        }
+
+        // 更新待回复计数
+        function updatePendingCount() {
+            const pendingCount = messages.filter(m => !m.adminReply).length;
+            document.getElementById('pending-count').textContent = pendingCount;
+        }
+
+        // 格式化时间
+        function formatTime(timestamp) {
+            const date = new Date(timestamp);
+            return date.toLocaleString('zh-CN', {
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // HTML转义
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // 返回上一页
+        function goBack() {
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

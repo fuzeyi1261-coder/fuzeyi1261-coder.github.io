@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>班级早到记录系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .app-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 25px 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .header .subtitle {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .card-custom {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: none;
+        }
+
+        .card-custom h3 {
+            color: #2c3e50;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-primary-custom {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 10px 25px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+
+        .btn-success-custom {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            border: none;
+            color: white;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-success-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(17, 153, 142, 0.4);
+            color: white;
+        }
+
+        .btn-danger-custom {
+            background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+            border: none;
+            color: white;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-danger-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(235, 51, 73, 0.4);
+            color: white;
+        }
+
+        .form-control-custom {
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+            padding: 10px 15px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control-custom:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .student-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+        }
+
+        .student-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .student-card.top-10 {
+            border-left-color: #ffd700;
+            background: linear-gradient(135deg, #fff9c4 0%, #ffecb3 100%);
+        }
+
+        .student-rank {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .student-rank.top-1 {
+            background: linear-gradient(135deg, #f5af19 0%, #f12711 100%);
+        }
+
+        .student-rank.top-2 {
+            background: linear-gradient(135deg, #bdc3c7 0%, #2c3e50 100%);
+        }
+
+        .student-rank.top-3 {
+            background: linear-gradient(135deg, #cd7f32 0%, #8b4513 100%);
+        }
+
+        .score-badge {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .group-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+        }
+
+        .group-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .group-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .group-score {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 700;
+        }
+
+        .btn-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-icon:hover {
+            transform: scale(1.1);
+        }
+
+        .btn-add {
+            background: #38ef7d;
+            color: white;
+        }
+
+        .btn-minus {
+            background: #f45c43;
+            color: white;
+        }
+
+        .pip-container {
+            display: none;
+        }
+
+        .pip-content {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+        }
+
+        .pip-header {
+            text-align: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .pip-header h4 {
+            color: #2c3e50;
+            margin: 0;
+        }
+
+        .pip-group {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .pip-group-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .pip-group-name {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .pip-group-score {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .pip-student {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 10px;
+            background: white;
+            border-radius: 6px;
+            margin-bottom: 5px;
+        }
+
+        .pip-student-name {
+            font-size: 13px;
+            color: #34495e;
+        }
+
+        .pip-student-score {
+            font-weight: 700;
+            color: #11998e;
+            font-size: 14px;
+        }
+
+        .arrival-time {
+            font-size: 12px;
+            color: #95a5a6;
+        }
+
+        .modal-custom {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-custom.show {
+            display: flex;
+        }
+
+        .modal-content-custom {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #95a5a6;
+        }
+
+        .empty-state .material-icons {
+            font-size: 64px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            background: #e0e0e0;
+            color: #7f8c8d;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .tab-btn:hover:not(.active) {
+            background: #d0d0d0;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 20px;
+            }
+
+            .card-custom {
+                padding: 20px;
+            }
+
+            .student-card {
+                padding: 12px;
+            }
+
+            .group-card {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // 初始数据
+        const initialGroups = [
+            { id: 1, name: '第一组', students: [] },
+            { id: 2, name: '第二组', students: [] },
+            { id: 3, name: '第三组', students: [] },
+            { id: 4, name: '第四组', students: [] }
+        ];
+
+        // 主应用组件
+        function App() {
+            const [groups, setGroups] = useState(() => {
+                const saved = localStorage.getItem('classEarlyBirdGroups');
+                return saved ? JSON.parse(saved) : initialGroups;
+            });
+
+            const [todayArrivals, setTodayArrivals] = useState(() => {
+                const saved = localStorage.getItem('classEarlyBirdToday');
+                return saved ? JSON.parse(saved) : [];
+            });
+
+            const [activeTab, setActiveTab] = useState('arrival');
+            const [newStudentName, setNewStudentName] = useState('');
+            const [selectedGroup, setSelectedGroup] = useState(1);
+            const [manualScoreStudent, setManualScoreStudent] = useState(null);
+            const [scoreAmount, setScoreAmount] = useState(2);
+            const [showPip, setShowPip] = useState(false);
+
+            // 保存数据到localStorage
+            useEffect(() => {
+                localStorage.setItem('classEarlyBirdGroups', JSON.stringify(groups));
+            }, [groups]);
+
+            useEffect(() => {
+                localStorage.setItem('classEarlyBirdToday', JSON.stringify(todayArrivals));
+            }, [todayArrivals]);
+
+            // 检查是否是新的一天
+            useEffect(() => {
+                const today = new Date().toDateString();
+                const lastDate = localStorage.getItem('classEarlyBirdLastDate');
+                if (lastDate !== today) {
+                    setTodayArrivals([]);
+                    localStorage.setItem('classEarlyBirdLastDate', today);
+                }
+            }, []);
+
+            // 添加学生
+            const addStudent = () => {
+                if (!newStudentName.trim()) return;
+
+                const updatedGroups = groups.map(group => {
+                    if (group.id === selectedGroup) {
+                        return {
+                            ...group,
+                            students: [
+                                ...group.students,
+                                {
+                                    id: Date.now(),
+                                    name: newStudentName.trim(),
+                                    score: 0
+                                }
+                            ]
+                        };
+                    }
+                    return group;
+                });
+
+                setGroups(updatedGroups);
+                setNewStudentName('');
+            };
+
+            // 记录到达（签到）
+            const recordArrival = (groupId, studentId) => {
+                const existingArrival = todayArrivals.find(
+                    a => a.groupId === groupId && a.studentId === studentId
+                );
+
+                if (existingArrival) {
+                    alert('今天已经签到过了！');
+                    return;
+                }
+
+                if (todayArrivals.length >= 10) {
+                    alert('今天的前10名已经满员！');
+                    return;
+                }
+
+                const arrivalTime = new Date();
+                const newArrival = {
+                    groupId,
+                    studentId,
+                    time: arrivalTime.getTime(),
+                    formattedTime: arrivalTime.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
+                };
+
+                const updatedArrivals = [...todayArrivals, newArrival];
+                setTodayArrivals(updatedArrivals);
+
+                // 加分
+                addScore(groupId, studentId, 2);
+            };
+
+            // 加分
+            const addScore = (groupId, studentId, amount) => {
+                const updatedGroups = groups.map(group => {
+                    if (group.id === groupId) {
+                        return {
+                            ...group,
+                            students: group.students.map(student => {
+                                if (student.id === studentId) {
+                                    return { ...student, score: student.score + amount };
+                                }
+                                return student;
+                            })
+                        };
+                    }
+                    return group;
+                });
+
+                setGroups(updatedGroups);
+            };
+
+            // 手动加减分
+            const handleManualScore = () => {
+                if (!manualScoreStudent) return;
+
+                addScore(
+                    manualScoreStudent.groupId,
+                    manualScoreStudent.studentId,
+                    scoreAmount
+                );
+
+                setManualScoreStudent(null);
+                setScoreAmount(2);
+            };
+
+            // 添加新组
+            const addGroup = () => {
+                const groupName = prompt('请输入新组的名称：');
+                if (!groupName || !groupName.trim()) return;
+
+                const newGroup = {
+                    id: Date.now(),
+                    name: groupName.trim(),
+                    students: []
+                };
+
+                setGroups([...groups, newGroup]);
+            };
+
+            // 删除组
+            const deleteGroup = (groupId) => {
+                if (!confirm('确定要删除这个组吗？')) return;
+                setGroups(groups.filter(g => g.id !== groupId));
+            };
+
+            // 删除学生
+            const deleteStudent = (groupId, studentId) => {
+                if (!confirm('确定要删除这个学生吗？')) return;
+
+                const updatedGroups = groups.map(group => {
+                    if (group.id === groupId) {
+                        return {
+                            ...group,
+                            students: group.students.filter(s => s.id !== studentId)
+                        };
+                    }
+                    return group;
+                });
+
+                setGroups(updatedGroups);
+
+                // 同时清理该学生的签到记录
+                const updatedArrivals = todayArrivals.filter(
+                    a => !(a.groupId === groupId && a.studentId === studentId)
+                );
+                setTodayArrivals(updatedArrivals);
+            };
+
+            // 重置今日签到
+            const resetToday = () => {
+                if (!confirm('确定要重置今天的签到记录吗？')) return;
+                setTodayArrivals([]);
+            };
+
+            // 画中画功能
+            const openPip = async () => {
+                const pipContainer = document.getElementById('pip-container');
+                const pipContent = document.getElementById('pip-content');
+
+                try {
+                    if (document.pictureInPictureElement) {
+                        await document.exitPictureInPicture();
+                        return;
+                    }
+
+                    pipContainer.style.display = 'block';
+                    await pipContent.requestPictureInPicture();
+                } catch (error) {
+                    alert('您的浏览器不支持画中画功能，或者需要用户交互才能触发。');
+                }
+            };
+
+            // 获取所有学生的排名（按今日到达时间）
+            const getArrivalRankings = () => {
+                const rankings = todayArrivals.map((arrival, index) => {
+                    const group = groups.find(g => g.id === arrival.groupId);
+                    const student = group?.students.find(s => s.id === arrival.studentId);
+                    return {
+                        ...arrival,
+                        rank: index + 1,
+                        studentName: student?.name || '未知',
+                        groupName: group?.name || '未知组',
+                        studentId: arrival.studentId
+                    };
+                });
+
+                return rankings;
+            };
+
+            // 获取小组总分
+            const getGroupScore = (groupId) => {
+                const group = groups.find(g => g.id === groupId);
+                if (!group) return 0;
+                return group.students.reduce((total, student) => total + student.score, 0);
+            };
+
+            // 排名显示组件
+            const ArrivalRankings = () => {
+                const rankings = getArrivalRankings();
+
+                return (
+                    <div className="card-custom">
+                        <h3>
+                            <span className="material-icons">emoji_events</span>
+                            今日早到排行榜（前10名）
+                        </h3>
+
+                        {rankings.length === 0 ? (
+                            <div className="empty-state">
+                                <span className="material-icons">schedule</span>
+                                <p>还没有人签到</p>
+                            </div>
+                        ) : (
+                            <div>
+                                {rankings.map((ranking, index) => (
+                                    <div
+                                        key={`${ranking.groupId}-${ranking.studentId}`}
+                                        className={`student-card ${index < 10 ? 'top-10' : ''}`}
+                                    >
+                                        <div className="d-flex align-items-center justify-content-between">
+                                            <div className="d-flex align-items-center gap-3">
+                                                <div className={`student-rank ${index < 3 ? `top-${index + 1}` : ''}`}>
+                                                    {ranking.rank}
+                                                </div>
+                                                <div>
+                                                    <h5 className="mb-1" style={{color: '#2c3e50', fontWeight: 600}}>
+                                                        {ranking.studentName}
+                                                    </h5>
+                                                    <p className="mb-0 arrival-time">
+                                                        {ranking.groupName} · 到达时间: {ranking.formattedTime}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div className="score-badge">
+                                                +2 分
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        <div className="mt-3 d-flex gap-2 flex-wrap">
+                            <button
+                                className="btn btn-primary-custom"
+                                onClick={resetToday}
+                            >
+                                <span className="material-icons align-middle me-1">refresh</span>
+                                重置今日
+                            </button>
+                        </div>
+                    </div>
+                );
+            };
+
+            // 签到界面组件
+            const CheckInPanel = () => {
+                return (
+                    <div className="card-custom">
+                        <h3>
+                            <span className="material-icons">how_to_reg</span>
+                            快速签到
+                        </h3>
+
+                        <div className="row">
+                            {groups.map(group => (
+                                <div key={group.id} className="col-md-6 mb-3">
+                                    <div className="group-card">
+                                        <div className="group-header">
+                                            <span className="group-name">{group.name}</span>
+                                            <span className="group-score">{getGroupScore(group.id)} 分</span>
+                                        </div>
+                                        {group.students.length === 0 ? (
+                                            <p className="text-muted mb-0">还没有学生</p>
+                                        ) : (
+                                            <div className="d-flex flex-wrap gap-2">
+                                                {group.students.map(student => {
+                                                    const hasArrived = todayArrivals.some(
+                                                        a => a.groupId === group.id && a.studentId === student.id
+                                                    );
+                                                    return (
+                                                        <button
+                                                            key={student.id}
+                                                            className={`btn ${hasArrived ? 'btn-success-custom' : 'btn-outline-primary'}`}
+                                                            disabled={hasArrived}
+                                                            onClick={() => recordArrival(group.id, student.id)}
+                                                            style={{
+                                                                opacity: hasArrived ? 0.7 : 1,
+                                                                cursor: hasArrived ? 'not-allowed' : 'pointer'
+                                                            }}
+                                                        >
+                                                            {student.name}
+                                                            {hasArrived && <span className="material-icons align-middle ms-1" style={{fontSize: 16}}>check</span>}
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                );
+            };
+
+            // 积分管理组件
+            const ScoreManagement = () => {
+                return (
+                    <div className="card-custom">
+                        <h3>
+                            <span className="material-icons">stars</span>
+                            积分管理
+                        </h3>
+
+                        <div className="row">
+                            {groups.map(group => (
+                                <div key={group.id} className="col-md-6 mb-3">
+                                    <div className="group-card">
+                                        <div className="group-header">
+                                            <span className="group-name">{group.name}</span>
+                                            <span className="group-score">{getGroupScore(group.id)} 分</span>
+                                        </div>
+
+                                        {group.students.length === 0 ? (
+                                            <p className="text-muted mb-0">还没有学生</p>
+                                        ) : (
+                                            <div>
+                                                {group.students.map(student => (
+                                                    <div
+                                                        key={student.id}
+                                                        className="student-card mb-2"
+                                                    >
+                                                        <div className="d-flex align-items-center justify-content-between">
+                                                            <div>
+                                                                <h6 className="mb-1" style={{color: '#2c3e50'}}>
+                                                                    {student.name}
+                                                                </h6>
+                                                                <span className="score-badge" style={{fontSize: 14, padding: '3px 10px'}}>
+                                                                    {student.score} 分
+                                                                </span>
+                                                            </div>
+                                                            <div className="d-flex gap-2">
+                                                                <button
+                                                                    className="btn-icon btn-add"
+                                                                    onClick={() => {
+                                                                        setManualScoreStudent({groupId: group.id, studentId: student.id});
+                                                                        setScoreAmount(2);
+                                                                    }}
+                                                                    title="加分"
+                                                                >
+                                                                    <span className="material-icons">add</span>
+                                                                </button>
+                                                                <button
+                                                                    className="btn-icon btn-minus"
+                                                                    onClick={() => {
+                                                                        setManualScoreStudent({groupId: group.id, studentId: student.id});
+                                                                        setScoreAmount(-2);
+                                                                    }}
+                                                                    title="减分"
+                                                                >
+                                                                    <span className="material-icons">remove</span>
+                                                                </button>
+                                                                <button
+                                                                    className="btn-icon"
+                                                                    style={{background: '#e0e0e0'}}
+                                                                    onClick={() => deleteStudent(group.id, student.id)}
+                                                                    title="删除"
+                                                                >
+                                                                    <span className="material-icons" style={{color: '#666'}}>delete</span>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                );
+            };
+
+            // 学生管理组件
+            const StudentManagement = () => {
+                return (
+                    <div className="card-custom">
+                        <h3>
+                            <span className="material-icons">people</span>
+                            学生管理
+                        </h3>
+
+                        <div className="mb-4">
+                            <div className="row g-3">
+                                <div className="col-md-4">
+                                    <input
+                                        type="text"
+                                        className="form-control form-control-custom"
+                                        placeholder="学生姓名"
+                                        value={newStudentName}
+                                        onChange={(e) => setNewStudentName(e.target.value)}
+                                        onKeyPress={(e) => e.key === 'Enter' && addStudent()}
+                                    />
+                                </div>
+                                <div className="col-md-4">
+                                    <select
+                                        className="form-select form-control-custom"
+                                        value={selectedGroup}
+                                        onChange={(e) => setSelectedGroup(parseInt(e.target.value))}
+                                    >
+                                        {groups.map(group => (
+                                            <option key={group.id} value={group.id}>{group.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="col-md-4">
+                                    <button className="btn btn-primary-custom" onClick={addStudent}>
+                                        <span className="material-icons align-middle me-1">person_add</span>
+                                        添加学生
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="mb-3 d-flex gap-2 flex-wrap">
+                            <button className="btn btn-success-custom" onClick={addGroup}>
+                                <span className="material-icons align-middle me-1">add_group</span>
+                                添加新组
+                            </button>
+                        </div>
+
+                        <div className="row">
+                            {groups.map(group => (
+                                <div key={group.id} className="col-md-6 mb-3">
+                                    <div className="group-card">
+                                        <div className="group-header">
+                                            <span className="group-name">{group.name}</span>
+                                            <div>
+                                                <span className="group-score me-2">{group.students.length} 人</span>
+                                                {groups.length > 1 && (
+                                                    <button
+                                                        className="btn-icon"
+                                                        style={{background: '#f45c43', color: 'white'}}
+                                                        onClick={() => deleteGroup(group.id)}
+                                                        title="删除组"
+                                                    >
+                                                        <span className="material-icons" style={{fontSize: 18}}>delete</span>
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {group.students.length === 0 ? (
+                                            <p className="text-muted mb-0">还没有学生</p>
+                                        ) : (
+                                            <div className="d-flex flex-wrap gap-2">
+                                                {group.students.map(student => (
+                                                    <span
+                                                        key={student.id}
+                                                        className="badge"
+                                                        style={{
+                                                            background: '#e0e0e0',
+                                                            color: '#333',
+                                                            padding: '8px 12px',
+                                                            fontSize: 14,
+                                                            fontWeight: 500
+                                                        }}
+                                                    >
+                                                        {student.name}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                );
+            };
+
+            // 画中画内容组件
+            const PipContent = () => {
+                return (
+                    <div id="pip-container" className="pip-container">
+                        <div id="pip-content" className="pip-content">
+                            <div className="pip-header">
+                                <h4>🏆 班级积分榜</h4>
+                            </div>
+                            {groups.map(group => (
+                                <div key={group.id} className="pip-group">
+                                    <div className="pip-group-header">
+                                        <span className="pip-group-name">{group.name}</span>
+                                        <span className="pip-group-score">{getGroupScore(group.id)} 分</span>
+                                    </div>
+                                    {group.students.map(student => (
+                                        <div key={student.id} className="pip-student">
+                                            <span className="pip-student-name">{student.name}</span>
+                                            <span className="pip-student-score">{student.score}分</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                );
+            };
+
+            return (
+                <div className="app-container">
+                    <div className="header">
+                        <h1>🎓 班级早到记录系统</h1>
+                        <p className="subtitle mb-0">记录最先到达的10名学生，支持分组积分管理</p>
+                    </div>
+
+                    <div className="mb-3 d-flex gap-2 flex-wrap justify-content-between align-items-center">
+                        <div className="tab-buttons">
+                            <button
+                                className={`tab-btn ${activeTab === 'arrival' ? 'active' : ''}`}
+                                onClick={() => setActiveTab('arrival')}
+                            >
+                                <span className="material-icons align-middle" style={{fontSize: 18}}>how_to_reg</span>
+                                签到
+                            </button>
+                            <button
+                                className={`tab-btn ${activeTab === 'ranking' ? 'active' : ''}`}
+                                onClick={() => setActiveTab('ranking')}
+                            >
+                                <span className="material-icons align-middle" style={{fontSize: 18}}>emoji_events</span>
+                                排行榜
+                            </button>
+                            <button
+                                className={`tab-btn ${activeTab === 'score' ? 'active' : ''}`}
+                                onClick={() => setActiveTab('score')}
+                            >
+                                <span className="material-icons align-middle" style={{fontSize: 18}}>stars</span>
+                                积分管理
+                            </button>
+                            <button
+                                className={`tab-btn ${activeTab === 'manage' ? 'active' : ''}`}
+                                onClick={() => setActiveTab('manage')}
+                            >
+                                <span className="material-icons align-middle" style={{fontSize: 18}}>people</span>
+                                学生管理
+                            </button>
+                        </div>
+
+                        <button className="btn btn-primary-custom" onClick={openPip}>
+                            <span className="material-icons align-middle me-1">picture_in_picture_alt</span>
+                            画中画悬浮
+                        </button>
+                    </div>
+
+                    {activeTab === 'arrival' && <CheckInPanel />}
+                    {activeTab === 'ranking' && <ArrivalRankings />}
+                    {activeTab === 'score' && <ScoreManagement />}
+                    {activeTab === 'manage' && <StudentManagement />}
+
+                    <PipContent />
+
+                    {/* 手动加减分模态框 */}
+                    {manualScoreStudent && (
+                        <div className="modal-custom show" onClick={() => setManualScoreStudent(null)}>
+                            <div className="modal-content-custom" onClick={(e) => e.stopPropagation()}>
+                                <h4 className="mb-4" style={{color: '#2c3e50'}}>
+                                    <span className="material-icons align-middle" style={{fontSize: 24}}>
+                                        {scoreAmount > 0 ? 'add_circle' : 'remove_circle'}
+                                    </span>
+                                    {' '}
+                                    {scoreAmount > 0 ? '加分' : '减分'}
+                                </h4>
+
+                                <div className="mb-4">
+                                    <label className="form-label" style={{fontWeight: 600, color: '#2c3e50'}}>
+                                        分数调整
+                                    </label>
+                                    <div className="d-flex gap-2 align-items-center">
+                                        <button
+                                            className="btn btn-icon btn-minus"
+                                            onClick={() => setScoreAmount(scoreAmount - 1)}
+                                            disabled={scoreAmount <= -10}
+                                        >
+                                            <span className="material-icons">remove</span>
+                                        </button>
+                                        <input
+                                            type="number"
+                                            className="form-control form-control-custom text-center"
+                                            value={scoreAmount}
+                                            onChange={(e) => setScoreAmount(parseInt(e.target.value) || 0)}
+                                            style={{maxWidth: 100}}
+                                        />
+                                        <button
+                                            className="btn btn-icon btn-add"
+                                            onClick={() => setScoreAmount(scoreAmount + 1)}
+                                            disabled={scoreAmount >= 10}
+                                        >
+                                            <span className="material-icons">add</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div className="d-flex gap-2 justify-content-end">
+                                    <button
+                                        className="btn btn-outline-secondary"
+                                        onClick={() => setManualScoreStudent(null)}
+                                    >
+                                        取消
+                                    </button>
+                                    <button
+                                        className={`btn ${scoreAmount > 0 ? 'btn-success-custom' : 'btn-danger-custom'}`}
+                                        onClick={handleManualScore}
+                                    >
+                                        确认 {scoreAmount > 0 ? '加分' : '减分'}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        // 渲染应用
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

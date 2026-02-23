@@ -1,0 +1,2055 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Early Bird 记录</title>
+    <style>
+        /* 全局样式重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        /* 纯色背景 */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e3f2fd;
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        /* 容器样式 */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+        }
+        
+        /* 标题样式 */
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            font-size: 2.8em;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            animation: fadeInDown 0.6s ease-out;
+        }
+        
+        /* 输入区域样式 */
+        .input-section {
+            background-color: #f0f8ff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            text-align: center;
+            animation: fadeInUp 0.6s ease-out 0.2s both;
+        }
+        
+        .input-section h2 {
+            margin-bottom: 25px;
+            color: #4facfe;
+            font-size: 1.8em;
+            font-weight: 600;
+        }
+        
+        /* 输入框样式 */
+        #name-input {
+            padding: 12px 16px;
+            font-size: 18px;
+            border: 2px solid #e0e7ff;
+            border-radius: 8px;
+            width: 300px;
+            margin-right: 15px;
+            outline: none;
+            transition: all 0.3s ease;
+            background-color: #f9fafb;
+        }
+        
+        #name-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            background-color: white;
+        }
+        
+        /* 学号选择样式 */
+        .student-id-section {
+            margin: 20px 0;
+        }
+        
+        .student-id-section input {
+            padding: 10px 14px;
+            font-size: 16px;
+            border: 2px solid #e0e7ff;
+            border-radius: 8px;
+            width: 140px;
+            margin-right: 10px;
+            outline: none;
+            transition: all 0.3s ease;
+            background-color: #f9fafb;
+        }
+        
+        .student-id-section input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            background-color: white;
+        }
+        
+        /* 学生标签样式 */
+        .student-list {
+            margin-top: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .student-item {
+            background-color: #42a5f5;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .student-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        }
+        
+        .student-id {
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        
+        /* 输入选项样式 */
+        .input-options {
+            margin-top: 25px;
+            padding-top: 25px;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .input-options h3 {
+            margin-bottom: 15px;
+            color: #4b5563;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        /* 按钮样式 */
+        button {
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+            background-color: #42a5f5;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(66, 165, 245, 0.3);
+        }
+        
+        button:hover {
+            background-color: #2196f3;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(66, 165, 245, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        /* 小按钮样式 */
+        .small-btn {
+            padding: 10px 18px;
+            font-size: 14px;
+            border-radius: 6px;
+        }
+        
+        /* 删除按钮样式 */
+        button[onclick^="deleteRecord"] {
+            background-color: #f44336;
+            box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
+        }
+        
+        button[onclick^="deleteRecord"]:hover {
+            background-color: #d32f2f;
+            box-shadow: 0 6px 16px rgba(244, 67, 54, 0.4);
+        }
+        
+        /* 恢复按钮样式 */
+        .restore-btn {
+            background-color: #4caf50 !important;
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3) !important;
+            font-size: 12px !important;
+            padding: 6px 12px !important;
+        }
+        
+        .restore-btn:hover {
+            background-color: #388e3c !important;
+            box-shadow: 0 6px 16px rgba(76, 175, 80, 0.4) !important;
+        }
+        
+        /* 显示区域样式 */
+        .display-section {
+            background-color: #f0f8ff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            animation: fadeInUp 0.6s ease-out 0.4s both;
+        }
+        
+        .display-section h2 {
+            margin-bottom: 25px;
+            color: #4facfe;
+            font-size: 1.8em;
+            font-weight: 600;
+        }
+        
+        /* 表格样式 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        th {
+            padding: 16px;
+            text-align: center;
+            background-color: #42a5f5;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        td {
+            padding: 14px 16px;
+            text-align: center;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        tr:hover {
+            background-color: #f9fafb;
+        }
+        
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        /* 排名样式 */
+        .rank {
+            font-weight: bold;
+            color: #4facfe;
+            font-size: 18px;
+        }
+        
+        /* 时间样式 */
+        .time {
+            color: #6b7280;
+            font-size: 14px;
+        }
+        
+        /* 空消息样式 */
+        .empty-message {
+            text-align: center;
+            color: #9ca3af;
+            padding: 40px;
+            font-style: italic;
+            font-size: 16px;
+        }
+        
+        /* 控制区域样式 */
+        .controls {
+            text-align: center;
+            margin-bottom: 30px;
+            animation: fadeInUp 0.6s ease-out 0.6s both;
+        }
+        
+        /* 重置按钮样式 */
+        #reset-btn {
+            background-color: #f44336;
+            box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
+        }
+        
+        #reset-btn:hover {
+            background-color: #d32f2f;
+            box-shadow: 0 6px 16px rgba(244, 67, 54, 0.4);
+        }
+        
+        /* 清空删除记录按钮样式 */
+        #clear-deleted-btn {
+            background-color: #ff9800;
+            box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+        }
+        
+        #clear-deleted-btn:hover {
+            background-color: #f57c00;
+            box-shadow: 0 6px 16px rgba(255, 152, 0, 0.4);
+        }
+        
+        /* 消息样式 */
+        .message {
+            margin-top: 20px;
+            padding: 14px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            animation: slideInUp 0.3s ease-out;
+        }
+        
+        .success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+        
+        .error {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+        
+        /* 模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 12px;
+            width: 400px;
+            max-width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideInDown 0.3s ease-out;
+        }
+        
+        .modal-content h3 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: #2d3748;
+            font-size: 20px;
+            font-weight: 700;
+        }
+        
+        #delete-reason {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 16px;
+            border: 2px solid #e0e7ff;
+            border-radius: 8px;
+            resize: vertical;
+            min-height: 100px;
+            outline: none;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        #delete-reason:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        /* 模态框按钮组 */
+        .modal-content div {
+            text-align: right;
+        }
+        
+        #cancel-delete {
+            background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+            box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
+        }
+        
+        #cancel-delete:hover {
+            box-shadow: 0 6px 16px rgba(107, 114, 128, 0.4);
+        }
+        
+        #confirm-delete {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+        
+        #confirm-delete:hover {
+            box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+        }
+        
+        /* 动画效果 */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* 音频播放器样式 */
+        .audio-player {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .audio-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .progress-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .progress-bar {
+            flex: 1;
+            height: 8px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: #e0e7ff;
+            border-radius: 4px;
+            outline: none;
+            cursor: pointer;
+        }
+        
+        .progress-bar::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #42a5f5;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .progress-bar::-webkit-slider-thumb:hover {
+            background: #2196f3;
+            transform: scale(1.2);
+        }
+        
+        .progress-bar::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #42a5f5;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .progress-bar::-moz-range-thumb:hover {
+            background: #2196f3;
+            transform: scale(1.2);
+        }
+        
+        #current-time, #duration {
+            font-size: 14px;
+            color: #6b7280;
+            min-width: 45px;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 2.2em;
+            }
+            
+            #name-input {
+                width: 100%;
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+            
+            button {
+                width: 100%;
+                margin: 5px 0;
+            }
+            
+            table {
+                font-size: 14px;
+            }
+            
+            th, td {
+                padding: 10px;
+            }
+            
+            .student-id-section input {
+                width: 100%;
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 15% auto;
+            }
+            
+            .audio-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .progress-container {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+            
+            #current-time, #duration {
+                min-width: auto;
+            }
+        }
+
+        /* 全屏显示样式 */
+        .ranking-item {
+            background-color: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 12px;
+            padding: 30px;
+            width: 200px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .ranking-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .ranking-item:nth-child(1) {
+            border-color: #ffd700;
+            background-color: #fff9c4;
+        }
+
+        .ranking-item:nth-child(2) {
+            border-color: #c0c0c0;
+            background-color: #f5f5f5;
+        }
+
+        .ranking-item:nth-child(3) {
+            border-color: #cd7f32;
+            background-color: #fff3e0;
+        }
+
+        .ranking-number {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #495057;
+        }
+
+        .ranking-item:nth-child(1) .ranking-number {
+            color: #ffd700;
+        }
+
+        .ranking-item:nth-child(2) .ranking-number {
+            color: #c0c0c0;
+        }
+
+        .ranking-item:nth-child(3) .ranking-number {
+            color: #cd7f32;
+        }
+
+        .ranking-name {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #343a40;
+        }
+
+        .ranking-time {
+            font-size: 16px;
+            color: #6c757d;
+        }
+
+        /* 历史排行榜样式 */
+        .history-item {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .history-header {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #343a40;
+        }
+
+        .history-records {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .history-record-item {
+            background-color: #ffffff;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 15px;
+            width: 180px;
+            text-align: center;
+        }
+
+        .history-record-rank {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #495057;
+        }
+
+        .history-record-name {
+            font-size: 14px;
+            margin-bottom: 5px;
+            color: #343a40;
+        }
+
+        .history-record-time {
+            font-size: 12px;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Early Bird 记录</h1>
+        
+        <!-- 输入区域 -->
+        <div class="input-section">
+            <h2>添加到班记录</h2>
+            <input type="text" id="name-input" placeholder="请输入学号">
+            <button id="add-btn">提交</button>
+            
+            <!-- 学号快速选择 -->
+            <div class="input-options">
+                <h3>学号快速选择：</h3>
+                <div class="student-id-section">
+                    <input type="text" id="student-id-input" placeholder="学号">
+                    <input type="text" id="student-name-input" placeholder="姓名">
+                    <button id="add-student-btn" class="small-btn">添加学生</button>
+                    <button id="export-students-btn" class="small-btn">导出名单</button>
+                    <button id="import-students-btn" class="small-btn">导入名单</button>
+                    <input type="file" id="import-file" accept=".csv" style="display: none;">
+                </div>
+                <div id="student-list" class="student-list"></div>
+            </div>
+            
+            <div id="message" class="message"></div>
+        </div>
+        
+        <!-- 显示区域 -->
+        <div class="display-section">
+            <h2>前10名到班同学</h2>
+            <table id="records-table">
+                <thead>
+                    <tr>
+                        <th>排名</th>
+                        <th>姓名</th>
+                        <th>到班时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="records-body">
+                    <tr><td colspan="4" class="empty-message">暂无记录</td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- 删除记录区域 -->
+        <div class="display-section">
+            <h2>删除记录</h2>
+            <table id="deleted-records-table">
+                <thead>
+                    <tr>
+                        <th>序号</th>
+                        <th>姓名</th>
+                        <th>到班时间</th>
+                        <th>删除时间</th>
+                        <th>删除原因</th>
+                    </tr>
+                </thead>
+                <tbody id="deleted-records-body">
+                    <tr><td colspan="5" class="empty-message">暂无删除记录</td></tr>
+                </tbody>
+            </table>
+            <button id="clear-deleted-btn" class="small-btn">清空删除记录</button>
+        </div>
+        
+        <!-- 音频播放区域 -->
+        <div class="display-section">
+            <h2>音频播放</h2>
+            <div class="audio-player">
+                <audio id="audio-player" preload="metadata">
+                    <source src="" type="audio/mpeg">
+                    您的浏览器不支持音频播放。
+                </audio>
+                <div class="audio-controls">
+                    <button id="play-pause-btn" class="small-btn">播放</button>
+                    <div class="progress-container">
+                        <span id="current-time">00:00</span>
+                        <input type="range" id="progress-bar" class="progress-bar" min="0" max="100" value="0" step="0.1">
+                        <span id="duration">00:00</span>
+                    </div>
+                    <input type="file" id="audio-file-input" accept=".mp3,.wav,.ogg" style="display: none;">
+                    <button id="load-audio-btn" class="small-btn">加载音频</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 控制区域 -->
+        <div class="controls">
+            <button id="reset-btn">重置所有记录</button>
+            <button id="fullscreen-btn">全屏显示</button>
+            <button id="history-btn">历史排行榜</button>
+            <button id="export-btn">导出数据</button>
+            <button id="theme-btn">切换主题</button>
+            <button id="stats-btn">数据统计</button>
+        </div>
+        
+        <!-- 删除原因输入模态框 -->
+        <div id="delete-modal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
+            <div class="modal-content" style="background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 300px; border-radius: 8px;">
+                <h3 style="margin-top: 0;color: #2c3e50;">输入删除原因</h3>
+                <textarea id="delete-reason" rows="4" style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px;"></textarea>
+                <div style="text-align: right;">
+                    <button id="cancel-delete" style="background-color: #95a5a6; color: white; border: none; padding: 10px 20px; margin-right: 10px; border-radius: 4px; cursor: pointer;">取消</button>
+                    <button id="confirm-delete" style="background-color: #e74c3c; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;">确认</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 全屏显示界面 -->
+        <div id="fullscreen-view" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #ffffff; z-index: 2000; overflow: auto;">
+            <div class="fullscreen-content" style="max-width: 1200px; margin: 0 auto; padding: 40px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+                    <h1 style="font-size: 36px; color: #333; margin: 0;">Early Bird 排行榜</h1>
+                    <button id="exit-fullscreen-btn" style="padding: 12px 24px; font-size: 16px; background-color: #6c757d; color: white; border: none; border-radius: 8px; cursor: pointer;">退出全屏</button>
+                </div>
+                <div id="fullscreen-ranking" style="display: flex; justify-content: center; flex-wrap: wrap; gap: 20px;"></div>
+            </div>
+        </div>
+
+        <!-- 历史排行榜界面 -->
+        <div id="history-view" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #ffffff; z-index: 2000; overflow: auto;">
+            <div class="history-content" style="max-width: 1200px; margin: 0 auto; padding: 40px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+                    <h1 style="font-size: 36px; color: #333; margin: 0;">历史排行榜</h1>
+                    <button id="exit-history-btn" style="padding: 12px 24px; font-size: 16px; background-color: #6c757d; color: white; border: none; border-radius: 8px; cursor: pointer;">返回</button>
+                </div>
+                <div id="history-list" style="margin-bottom: 30px;"></div>
+                <button id="save-history-btn" style="padding: 12px 24px; font-size: 16px; background-color: #28a745; color: white; border: none; border-radius: 8px; cursor: pointer;">保存当前排行榜</button>
+            </div>
+        </div>
+        
+        <!-- 数据统计界面 -->
+        <div id="stats-view" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #ffffff; z-index: 2000; overflow: auto;">
+            <div class="stats-content" style="max-width: 1200px; margin: 0 auto; padding: 40px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+                    <h1 style="font-size: 36px; color: #333; margin: 0;">数据统计分析</h1>
+                    <button id="exit-stats-btn" style="padding: 12px 24px; font-size: 16px; background-color: #6c757d; color: white; border: none; border-radius: 8px; cursor: pointer;">返回</button>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-bottom: 40px;">
+                    <!-- 统计卡片 -->
+                    <div style="background-color: #f0f8ff; padding: 30px; border-radius: 12px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);">
+                        <h3 style="margin-top: 0; margin-bottom: 20px; color: #4facfe; font-size: 1.4em;">基本统计</h3>
+                        <div id="basic-stats" style="font-size: 16px; line-height: 1.6;"></div>
+                    </div>
+                    <div style="background-color: #f0f8ff; padding: 30px; border-radius: 12px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);">
+                        <h3 style="margin-top: 0; margin-bottom: 20px; color: #4facfe; font-size: 1.4em;">到班时间分析</h3>
+                        <div id="time-stats" style="font-size: 16px; line-height: 1.6;"></div>
+                    </div>
+                    <div style="background-color: #f0f8ff; padding: 30px; border-radius: 12px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);">
+                        <h3 style="margin-top: 0; margin-bottom: 20px; color: #4facfe; font-size: 1.4em;">学生活跃度</h3>
+                        <div id="activity-stats" style="font-size: 16px; line-height: 1.6;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 常量定义
+        const MAX_RECORDS = 10;
+        const STORAGE_KEY = 'earlyBirdRecords';
+        const STUDENTS_KEY = 'earlyBirdStudents';
+        const DELETED_RECORDS_KEY = 'earlyBirdDeletedRecords';
+        const HISTORY_KEY = 'earlyBirdHistoryRecords';
+        
+        // DOM元素
+        const nameInput = document.getElementById('name-input');
+        const addBtn = document.getElementById('add-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
+        const historyBtn = document.getElementById('history-btn');
+        const recordsBody = document.getElementById('records-body');
+        const messageDiv = document.getElementById('message');
+        const studentIdInput = document.getElementById('student-id-input');
+        const studentNameInput = document.getElementById('student-name-input');
+        const addStudentBtn = document.getElementById('add-student-btn');
+        const exportStudentsBtn = document.getElementById('export-students-btn');
+        const importStudentsBtn = document.getElementById('import-students-btn');
+        const importFileInput = document.getElementById('import-file');
+        const studentList = document.getElementById('student-list');
+        const deletedRecordsBody = document.getElementById('deleted-records-body');
+        const clearDeletedBtn = document.getElementById('clear-deleted-btn');
+        
+        // 音频播放相关元素
+        const audioPlayer = document.getElementById('audio-player');
+        const playPauseBtn = document.getElementById('play-pause-btn');
+        const progressBar = document.getElementById('progress-bar');
+        const currentTimeDisplay = document.getElementById('current-time');
+        const durationDisplay = document.getElementById('duration');
+        const loadAudioBtn = document.getElementById('load-audio-btn');
+        const audioFileInput = document.getElementById('audio-file-input');
+        
+        // 全屏显示相关元素
+        const fullscreenView = document.getElementById('fullscreen-view');
+        const exitFullscreenBtn = document.getElementById('exit-fullscreen-btn');
+        const fullscreenRanking = document.getElementById('fullscreen-ranking');
+        
+        // 历史排行榜相关元素
+        const historyView = document.getElementById('history-view');
+        const exitHistoryBtn = document.getElementById('exit-history-btn');
+        const historyList = document.getElementById('history-list');
+        const saveHistoryBtn = document.getElementById('save-history-btn');
+        
+        // 新功能相关元素
+        const exportBtn = document.getElementById('export-btn');
+        const themeBtn = document.getElementById('theme-btn');
+        const statsBtn = document.getElementById('stats-btn');
+        const statsView = document.getElementById('stats-view');
+        const exitStatsBtn = document.getElementById('exit-stats-btn');
+        const basicStats = document.getElementById('basic-stats');
+        const timeStats = document.getElementById('time-stats');
+        const activityStats = document.getElementById('activity-stats');
+        
+        // 模态框相关元素
+        const deleteModal = document.getElementById('delete-modal');
+        const deleteReasonInput = document.getElementById('delete-reason');
+        const cancelDeleteBtn = document.getElementById('cancel-delete');
+        const confirmDeleteBtn = document.getElementById('confirm-delete');
+        
+        // 全局变量，用于存储当前要删除的记录索引
+        let currentDeleteIndex = -1;
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadRecords();
+            loadStudents();
+            loadDeletedRecords();
+            
+            // 事件监听器
+            addBtn.addEventListener('click', addRecord);
+            resetBtn.addEventListener('click', resetRecords);
+            clearDeletedBtn.addEventListener('click', clearDeletedRecords);
+            fullscreenBtn.addEventListener('click', showFullscreen);
+            historyBtn.addEventListener('click', showHistory);
+            nameInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addRecord();
+                }
+            });
+            
+            // 全屏显示事件
+            exitFullscreenBtn.addEventListener('click', hideFullscreen);
+            
+            // 历史排行榜事件
+            exitHistoryBtn.addEventListener('click', hideHistory);
+            saveHistoryBtn.addEventListener('click', saveCurrentRanking);
+            
+            // 新功能事件
+            exportBtn.addEventListener('click', exportData);
+            themeBtn.addEventListener('click', toggleTheme);
+            statsBtn.addEventListener('click', showStats);
+            exitStatsBtn.addEventListener('click', hideStats);
+            
+            // 学生管理事件
+            addStudentBtn.addEventListener('click', addStudent);
+            exportStudentsBtn.addEventListener('click', exportStudents);
+            importStudentsBtn.addEventListener('click', function() {
+                importFileInput.click();
+            });
+            importFileInput.addEventListener('change', importStudents);
+            studentIdInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addStudent();
+                }
+            });
+            studentNameInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addStudent();
+                }
+            });
+            
+            // 模态框事件
+            cancelDeleteBtn.addEventListener('click', closeDeleteModal);
+            confirmDeleteBtn.addEventListener('click', confirmDelete);
+            
+            // 点击模态框外部关闭
+            deleteModal.addEventListener('click', function(e) {
+                if (e.target === deleteModal) {
+                    closeDeleteModal();
+                }
+            });
+            
+            // 音频播放事件
+            playPauseBtn.addEventListener('click', togglePlayPause);
+            progressBar.addEventListener('input', seekAudio);
+            audioPlayer.addEventListener('timeupdate', updateProgress);
+            audioPlayer.addEventListener('loadedmetadata', updateDuration);
+            audioPlayer.addEventListener('ended', handleAudioEnded);
+            loadAudioBtn.addEventListener('click', function() {
+                audioFileInput.click();
+            });
+            audioFileInput.addEventListener('change', loadAudioFile);
+        });
+        
+        // 音频播放功能
+        function togglePlayPause() {
+            if (audioPlayer.paused || audioPlayer.ended) {
+                audioPlayer.play();
+                playPauseBtn.textContent = '暂停';
+            } else {
+                audioPlayer.pause();
+                playPauseBtn.textContent = '播放';
+            }
+        }
+        
+        // 更新进度条
+        function updateProgress() {
+            if (audioPlayer.duration) {
+                const progress = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+                progressBar.value = progress;
+                currentTimeDisplay.textContent = formatTime(audioPlayer.currentTime);
+            }
+        }
+        
+        // 更新音频时长
+        function updateDuration() {
+            durationDisplay.textContent = formatTime(audioPlayer.duration);
+            progressBar.max = 100;
+        }
+        
+        // 跳转音频
+        function seekAudio() {
+            const seekTime = (progressBar.value / 100) * audioPlayer.duration;
+            audioPlayer.currentTime = seekTime;
+        }
+        
+        // 处理音频结束
+        function handleAudioEnded() {
+            playPauseBtn.textContent = '播放';
+            progressBar.value = 0;
+            currentTimeDisplay.textContent = '00:00';
+        }
+        
+        // 加载音频文件
+        function loadAudioFile(e) {
+            const file = e.target.files[0];
+            if (!file) {
+                return;
+            }
+            
+            // 检查文件类型
+            const validTypes = ['audio/mpeg', 'audio/wav', 'audio/ogg'];
+            if (!validTypes.includes(file.type)) {
+                showMessage('请选择有效的音频文件（MP3、WAV或OGG）', 'error');
+                return;
+            }
+            
+            // 创建文件URL
+            const fileURL = URL.createObjectURL(file);
+            
+            // 设置音频源
+            audioPlayer.src = fileURL;
+            audioPlayer.load();
+            
+            showMessage(`已加载音频：${file.name}`, 'success');
+            playPauseBtn.textContent = '播放';
+            progressBar.value = 0;
+            currentTimeDisplay.textContent = '00:00';
+            durationDisplay.textContent = '00:00';
+        }
+        
+        // 格式化时间（秒转换为分:秒）
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+        
+        // 学生数据相关函数
+        function getStudentsFromStorage() {
+            const studentsJson = localStorage.getItem(STUDENTS_KEY);
+            return studentsJson ? JSON.parse(studentsJson) : [];
+        }
+        
+        function saveStudentsToStorage(students) {
+            localStorage.setItem(STUDENTS_KEY, JSON.stringify(students));
+        }
+        
+        function loadStudents() {
+            const students = getStudentsFromStorage();
+            displayStudents(students);
+        }
+        
+        function displayStudents(students) {
+            studentList.innerHTML = '';
+            if (students.length === 0) {
+                studentList.innerHTML = '<div style="color: #95a5a6; font-style: italic;">暂无学生数据</div>';
+                return;
+            }
+            
+            students.forEach(student => {
+                const studentItem = document.createElement('div');
+                studentItem.className = 'student-item';
+                studentItem.innerHTML = `<span class="student-id">${student.id}</span>${student.name}`;
+                studentItem.addEventListener('click', function() {
+                    nameInput.value = student.id;
+                    addRecord();
+                });
+                studentList.appendChild(studentItem);
+            });
+        }
+        
+        function addStudent() {
+            const id = studentIdInput.value.trim();
+            const name = studentNameInput.value.trim();
+            
+            if (!id || !name) {
+                showMessage('请输入完整的学号和姓名', 'error');
+                return;
+            }
+            
+            const students = getStudentsFromStorage();
+            
+            // 检查学号是否已存在
+            const isExists = students.some(student => student.id === id);
+            if (isExists) {
+                showMessage('该学号已存在', 'error');
+                return;
+            }
+            
+            students.push({ id, name });
+            saveStudentsToStorage(students);
+            displayStudents(students);
+            
+            studentIdInput.value = '';
+            studentNameInput.value = '';
+            showMessage(`成功添加学生：${id} ${name}`, 'success');
+        }
+        
+        // 导出学生名单
+        function exportStudents() {
+            const students = getStudentsFromStorage();
+            
+            if (students.length === 0) {
+                showMessage('暂无学生数据可导出', 'error');
+                return;
+            }
+            
+            // 生成CSV内容
+            let csvContent = '学号,姓名\n';
+            students.forEach(student => {
+                csvContent += `${student.id},${student.name}\n`;
+            });
+            
+            // 创建下载链接
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            
+            // 设置下载属性
+            link.setAttribute('href', url);
+            link.setAttribute('download', `学生名单_${new Date().toISOString().slice(0, 10)}.csv`);
+            link.style.visibility = 'hidden';
+            
+            // 触发下载
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showMessage(`成功导出 ${students.length} 名学生数据`, 'success');
+        }
+        
+        // 根据学号获取学生姓名
+        function getStudentNameById(studentId) {
+            const students = getStudentsFromStorage();
+            const student = students.find(student => student.id === studentId);
+            return student ? student.name : studentId;
+        }
+        
+        // 导入学生名单
+        function importStudents(e) {
+            const file = e.target.files[0];
+            if (!file) {
+                return;
+            }
+            
+            // 读取文件
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const csvContent = event.target.result;
+                const students = parseCSV(csvContent);
+                
+                if (students.length === 0) {
+                    showMessage('未解析到有效学生数据', 'error');
+                    return;
+                }
+                
+                // 导入学生数据
+                const currentStudents = getStudentsFromStorage();
+                let importedCount = 0;
+                let skippedCount = 0;
+                
+                students.forEach(student => {
+                    // 检查学号是否已存在
+                    if (!currentStudents.some(s => s.id === student.id)) {
+                        currentStudents.push(student);
+                        importedCount++;
+                    } else {
+                        skippedCount++;
+                    }
+                });
+                
+                // 保存更新后的学生数据
+                saveStudentsToStorage(currentStudents);
+                displayStudents(currentStudents);
+                
+                // 显示导入结果
+                if (importedCount > 0) {
+                    showMessage(`成功导入 ${importedCount} 名学生，跳过 ${skippedCount} 名已存在学生`, 'success');
+                } else {
+                    showMessage(`所有学生数据已存在，未导入新数据`, 'error');
+                }
+                
+                // 重置文件输入
+                importFileInput.value = '';
+            };
+            
+            reader.onerror = function() {
+                showMessage('读取文件失败，请检查文件格式', 'error');
+                importFileInput.value = '';
+            };
+            
+            reader.readAsText(file, 'UTF-8');
+        }
+        
+        // 解析CSV文件
+        function parseCSV(csvContent) {
+            const students = [];
+            const lines = csvContent.split('\n');
+            
+            // 跳过标题行
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) {
+                    continue;
+                }
+                
+                // 解析CSV行，处理可能包含逗号的情况
+                const parts = line.split(',').map(part => part.trim());
+                if (parts.length >= 2) {
+                    const id = parts[0];
+                    const name = parts[1];
+                    
+                    if (id && name) {
+                        students.push({ id, name });
+                    }
+                }
+            }
+            
+            return students;
+        }
+        
+        // 删除记录相关函数
+        function getDeletedRecordsFromStorage() {
+            const deletedRecordsJson = localStorage.getItem(DELETED_RECORDS_KEY);
+            return deletedRecordsJson ? JSON.parse(deletedRecordsJson) : [];
+        }
+        
+        function saveDeletedRecordsToStorage(deletedRecords) {
+            localStorage.setItem(DELETED_RECORDS_KEY, JSON.stringify(deletedRecords));
+        }
+        
+        function loadDeletedRecords() {
+            const deletedRecords = getDeletedRecordsFromStorage();
+            displayDeletedRecords(deletedRecords);
+        }
+        
+        // 打开删除模态框
+        function deleteRecord(recordIndex) {
+            currentDeleteIndex = recordIndex;
+            deleteReasonInput.value = '';
+            deleteModal.style.display = 'block';
+        }
+        
+        // 关闭删除模态框
+        function closeDeleteModal() {
+            deleteModal.style.display = 'none';
+            currentDeleteIndex = -1;
+        }
+        
+        // 确认删除
+        function confirmDelete() {
+            if (currentDeleteIndex < 0) {
+                return;
+            }
+            
+            let records = getRecordsFromStorage();
+            if (currentDeleteIndex >= records.length) {
+                closeDeleteModal();
+                return;
+            }
+            
+            // 获取要删除的记录
+            const deletedRecord = records[currentDeleteIndex];
+            
+            // 获取删除原因
+            const reason = deleteReasonInput.value.trim() || '无原因';
+            
+            // 从记录中移除
+            records.splice(currentDeleteIndex, 1);
+            saveRecordsToStorage(records);
+            
+            // 将删除的记录添加到删除记录列表
+            const deletedRecords = getDeletedRecordsFromStorage();
+            deletedRecords.push({
+                ...deletedRecord,
+                deleteTime: new Date().toISOString(),
+                deleteReason: reason
+            });
+            saveDeletedRecordsToStorage(deletedRecords);
+            
+            // 更新显示
+            displayRecords(records);
+            displayDeletedRecords(deletedRecords);
+            
+            // 关闭模态框
+            closeDeleteModal();
+            
+            showMessage('记录已删除', 'success');
+        }
+        
+        // 确认清空模态框
+        function clearDeletedRecords() {
+            if (confirmAction('确定要清空所有删除记录吗？此操作不可恢复。')) {
+                saveDeletedRecordsToStorage([]);
+                displayDeletedRecords([]);
+                showMessage('删除记录已清空', 'success');
+            }
+        }
+        
+        // 通用确认函数
+        function confirmAction(message) {
+            // 创建一个简单的确认对话框
+            return window.confirm ? window.confirm(message) : true;
+        }
+        
+        // 加载记录
+        function loadRecords() {
+            const records = getRecordsFromStorage();
+            displayRecords(records);
+        }
+        
+        // 从存储获取记录
+        function getRecordsFromStorage() {
+            const recordsJson = localStorage.getItem(STORAGE_KEY);
+            return recordsJson ? JSON.parse(recordsJson) : [];
+        }
+        
+        // 保存记录到存储
+        function saveRecordsToStorage(records) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+        }
+
+        // 从存储获取历史记录
+        function getHistoryRecordsFromStorage() {
+            const historyJson = localStorage.getItem(HISTORY_KEY);
+            return historyJson ? JSON.parse(historyJson) : [];
+        }
+
+        // 保存历史记录到存储
+        function saveHistoryRecordsToStorage(historyRecords) {
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(historyRecords));
+        }
+        
+        // 添加记录
+        function addRecord() {
+            const studentId = nameInput.value.trim();
+            
+            if (!studentId) {
+                showMessage('请输入学号', 'error');
+                return;
+            }
+            
+            let records = getRecordsFromStorage();
+            
+            // 检查是否已存在相同学号的记录（兼容旧数据格式）
+            const isExists = records.some(record => {
+                // 新格式：比较studentId
+                if (record.studentId) {
+                    return record.studentId === studentId;
+                }
+                // 旧格式：比较name字段（旧格式中name可能是学号）
+                return record.name === studentId;
+            });
+            if (isExists) {
+                showMessage('该学号已记录', 'error');
+                return;
+            }
+            
+            // 检查是否已满
+            if (records.length >= MAX_RECORDS) {
+                showMessage('已记录满10名同学', 'error');
+                return;
+            }
+            
+            // 获取学生姓名
+            const studentName = getStudentNameById(studentId);
+            
+            // 创建新记录
+            const newRecord = {
+                studentId: studentId,
+                studentName: studentName,
+                time: new Date().toISOString()
+            };
+            
+            // 添加并保存
+            records.push(newRecord);
+            saveRecordsToStorage(records);
+            
+            // 显示更新后的记录
+            displayRecords(records);
+            
+            // 清空输入和显示成功消息
+            nameInput.value = '';
+            showMessage(`${studentName}（${studentId}）已成功添加到第 ${records.length} 名`, 'success');
+        }
+        
+        // 显示记录
+        function displayRecords(records) {
+            recordsBody.innerHTML = '';
+            
+            if (records.length === 0) {
+                recordsBody.innerHTML = '<tr><td colspan="4" class="empty-message">暂无记录</td></tr>';
+                return;
+            }
+            
+            // 按时间排序（确保顺序正确）
+            const sortedRecords = [...records].sort((a, b) => new Date(a.time) - new Date(b.time));
+            
+            // 显示记录
+            sortedRecords.forEach((record, index) => {
+                const row = document.createElement('tr');
+                const rank = index + 1;
+                const formattedTime = formatTime(record.time);
+                
+                // 检查记录格式，兼容旧数据
+                const studentId = record.studentId || record.name;
+                const studentName = record.studentName || '';
+                
+                row.innerHTML = `
+                    <td class="rank">${rank}</td>
+                    <td>${studentName}（${studentId}）</td>
+                    <td class="time">${formattedTime}</td>
+                    <td>
+                        <button onclick="deleteRecord(${index})" class="small-btn" style="background-color: #e74c3c;">删除</button>
+                    </td>
+                `;
+                
+                recordsBody.appendChild(row);
+            });
+        }
+        
+        // 显示删除记录
+        function displayDeletedRecords(deletedRecords) {
+            deletedRecordsBody.innerHTML = '';
+            
+            if (deletedRecords.length === 0) {
+                deletedRecordsBody.innerHTML = '<tr><td colspan="6" class="empty-message">暂无删除记录</td></tr>';
+                return;
+            }
+            
+            // 按删除时间倒序排序
+            const sortedDeletedRecords = [...deletedRecords].sort((a, b) => new Date(b.deleteTime) - new Date(a.deleteTime));
+            
+            // 显示删除记录
+            sortedDeletedRecords.forEach((record, index) => {
+                const row = document.createElement('tr');
+                const seq = index + 1;
+                const formattedTime = formatTime(record.time);
+                const formattedDeleteTime = formatTime(record.deleteTime);
+                
+                // 检查记录格式，兼容旧数据
+                const studentId = record.studentId || record.name;
+                const studentName = record.studentName || '';
+                
+                row.innerHTML = `
+                    <td>${seq}</td>
+                    <td>${studentName}（${studentId}）</td>
+                    <td class="time">${formattedTime}</td>
+                    <td class="time">${formattedDeleteTime}</td>
+                    <td>${record.deleteReason}</td>
+                    <td>
+                        <button onclick="restoreRecord(${index})" class="small-btn restore-btn">恢复</button>
+                    </td>
+                `;
+                
+                deletedRecordsBody.appendChild(row);
+            });
+        }
+        
+        // 恢复误删除的记录
+        function restoreRecord(deletedIndex) {
+            let deletedRecords = getDeletedRecordsFromStorage();
+            if (deletedIndex < 0 || deletedIndex >= deletedRecords.length) {
+                return;
+            }
+            
+            // 获取要恢复的记录
+            const restoredRecord = deletedRecords[deletedIndex];
+            
+            // 检查当前记录是否已满
+            let records = getRecordsFromStorage();
+            
+            // 检查该学号是否已经在记录中
+            const isExists = records.some(record => {
+                if (record.studentId) {
+                    return record.studentId === (restoredRecord.studentId || restoredRecord.name);
+                }
+                return record.name === (restoredRecord.studentId || restoredRecord.name);
+            });
+            
+            if (isExists) {
+                showMessage('该学号已在记录中', 'error');
+                return;
+            }
+            
+            // 从删除记录中移除
+            deletedRecords.splice(deletedIndex, 1);
+            saveDeletedRecordsToStorage(deletedRecords);
+            
+            // 创建恢复的记录（保持原始到班时间）
+            const newRecord = {
+                studentId: restoredRecord.studentId || restoredRecord.name,
+                studentName: restoredRecord.studentName || '',
+                time: restoredRecord.time
+            };
+            
+            // 添加到记录中
+            records.push(newRecord);
+            
+            // 按时间排序，保持正确的排名顺序
+            records.sort((a, b) => new Date(a.time) - new Date(b.time));
+            
+            // 如果超过10人，移除最末尾的记录
+            if (records.length > MAX_RECORDS) {
+                const removedRecord = records.pop();
+                showMessage(`恢复成功，但超过10人，${removedRecord.studentName || removedRecord.studentId} 被移出排行榜`, 'success');
+            } else {
+                showMessage('记录已恢复', 'success');
+            }
+            
+            saveRecordsToStorage(records);
+            
+            // 更新显示
+            displayRecords(records);
+            displayDeletedRecords(deletedRecords);
+        }
+        
+        // 格式化时间
+        function formatTime(timeString) {
+            const date = new Date(timeString);
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            const seconds = date.getSeconds().toString().padStart(2, '0');
+            return `${hours}:${minutes}:${seconds}`;
+        }
+        
+        // 重置记录
+        function resetRecords() {
+            if (confirmAction('确定要重置所有记录吗？此操作不可恢复。')) {
+                localStorage.removeItem(STORAGE_KEY);
+                displayRecords([]);
+                showMessage('所有记录已重置', 'success');
+            }
+        }
+        
+        // 显示全屏排行榜
+        function showFullscreen() {
+            const records = getRecordsFromStorage();
+            if (records.length === 0) {
+                showMessage('暂无记录，无法全屏显示', 'error');
+                return;
+            }
+            
+            // 生成全屏排行榜内容
+            generateFullscreenRanking(records);
+            
+            // 显示全屏界面
+            fullscreenView.style.display = 'block';
+        }
+
+        // 隐藏全屏排行榜
+        function hideFullscreen() {
+            fullscreenView.style.display = 'none';
+        }
+
+        // 生成全屏排行榜内容
+        function generateFullscreenRanking(records) {
+            // 按时间排序
+            const sortedRecords = [...records].sort((a, b) => new Date(a.time) - new Date(b.time));
+            
+            fullscreenRanking.innerHTML = '';
+            
+            sortedRecords.forEach((record, index) => {
+                const rank = index + 1;
+                const formattedTime = formatTime(record.time);
+                
+                // 检查记录格式，兼容旧数据
+                const studentId = record.studentId || record.name;
+                const studentName = record.studentName || '';
+                
+                const rankingItem = document.createElement('div');
+                rankingItem.className = 'ranking-item';
+                rankingItem.innerHTML = `
+                    <div class="ranking-number">${rank}</div>
+                    <div class="ranking-name">${studentName}（${studentId}）</div>
+                    <div class="ranking-time">${formattedTime}</div>
+                `;
+                
+                fullscreenRanking.appendChild(rankingItem);
+            });
+        }
+
+        // 显示历史排行榜
+        function showHistory() {
+            const historyRecords = getHistoryRecordsFromStorage();
+            generateHistoryList(historyRecords);
+            historyView.style.display = 'block';
+        }
+
+        // 隐藏历史排行榜
+        function hideHistory() {
+            historyView.style.display = 'none';
+        }
+
+        // 保存当前排行榜到历史记录
+        function saveCurrentRanking() {
+            const records = getRecordsFromStorage();
+            if (records.length === 0) {
+                showMessage('当前无记录可保存', 'error');
+                return;
+            }
+            
+            const historyRecords = getHistoryRecordsFromStorage();
+            
+            // 创建新的历史记录
+            const newHistoryRecord = {
+                id: Date.now(),
+                date: new Date().toISOString(),
+                records: [...records]
+            };
+            
+            historyRecords.push(newHistoryRecord);
+            saveHistoryRecordsToStorage(historyRecords);
+            
+            // 更新历史列表显示
+            generateHistoryList(historyRecords);
+            
+            showMessage('当前排行榜已保存到历史记录', 'success');
+        }
+
+        // 生成历史排行榜列表
+        function generateHistoryList(historyRecords) {
+            if (historyRecords.length === 0) {
+                historyList.innerHTML = '<div style="text-align: center; color: #999; padding: 20px;">暂无历史记录</div>';
+                return;
+            }
+            
+            // 按时间倒序排序
+            const sortedHistory = [...historyRecords].sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            historyList.innerHTML = '';
+            
+            sortedHistory.forEach(historyItem => {
+                const formattedDate = new Date(historyItem.date).toLocaleString();
+                
+                const historyElement = document.createElement('div');
+                historyElement.className = 'history-item';
+                
+                let recordsHTML = '';
+                const sortedRecords = [...historyItem.records].sort((a, b) => new Date(a.time) - new Date(b.time));
+                
+                sortedRecords.forEach((record, index) => {
+                    const rank = index + 1;
+                    const formattedTime = formatTime(record.time);
+                    const studentId = record.studentId || record.name;
+                    const studentName = record.studentName || '';
+                    
+                    recordsHTML += `
+                        <div class="history-record-item">
+                            <div class="history-record-rank">第${rank}名</div>
+                            <div class="history-record-name">${studentName}（${studentId}）</div>
+                            <div class="history-record-time">${formattedTime}</div>
+                        </div>
+                    `;
+                });
+                
+                historyElement.innerHTML = `
+                    <div class="history-header">${formattedDate}</div>
+                    <div class="history-records">${recordsHTML}</div>
+                `;
+                
+                historyList.appendChild(historyElement);
+            });
+        }
+
+        // 显示消息
+        function showMessage(message, type) {
+            messageDiv.textContent = message;
+            messageDiv.className = `message ${type}`;
+            
+            // 3秒后自动清除消息
+            setTimeout(() => {
+                messageDiv.textContent = '';
+                messageDiv.className = 'message';
+            }, 3000);
+        }
+
+        // 新功能实现
+        
+        // 导出数据功能
+        function exportData() {
+            // 收集所有数据
+            const data = {
+                records: getRecordsFromStorage(),
+                students: getStudentsFromStorage(),
+                deletedRecords: getDeletedRecordsFromStorage(),
+                historyRecords: getHistoryRecordsFromStorage(),
+                exportTime: new Date().toISOString()
+            };
+            
+            // 转换为JSON字符串
+            const jsonContent = JSON.stringify(data, null, 2);
+            
+            // 创建下载链接
+            const blob = new Blob([jsonContent], { type: 'application/json;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            
+            // 设置下载属性
+            link.setAttribute('href', url);
+            link.setAttribute('download', `EarlyBird数据_${new Date().toISOString().slice(0, 10)}.json`);
+            link.style.visibility = 'hidden';
+            
+            // 触发下载
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showMessage('数据导出成功', 'success');
+        }
+        
+        // 主题切换功能
+        function toggleTheme() {
+            const body = document.body;
+            const isDark = body.classList.contains('dark-theme');
+            
+            if (isDark) {
+                // 切换到浅色主题
+                body.classList.remove('dark-theme');
+                body.style.backgroundColor = '#e3f2fd';
+                body.style.color = '#333';
+                localStorage.setItem('theme', 'light');
+                showMessage('已切换到浅色主题', 'success');
+            } else {
+                // 切换到深色主题
+                body.classList.add('dark-theme');
+                body.style.backgroundColor = '#121212';
+                body.style.color = '#e0e0e0';
+                localStorage.setItem('theme', 'dark');
+                showMessage('已切换到深色主题', 'success');
+            }
+        }
+        
+        // 加载保存的主题
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-theme');
+                document.body.style.backgroundColor = '#121212';
+                document.body.style.color = '#e0e0e0';
+            }
+        }
+        
+        // 数据统计功能
+        function showStats() {
+            calculateStats();
+            statsView.style.display = 'block';
+        }
+        
+        function hideStats() {
+            statsView.style.display = 'none';
+        }
+        
+        function calculateStats() {
+            const records = getRecordsFromStorage();
+            const students = getStudentsFromStorage();
+            const historyRecords = getHistoryRecordsFromStorage();
+            
+            // 基本统计
+            let basicStatsHTML = `
+                <p>学生总数：${students.length}人</p>
+                <p>当前到班人数：${records.length}人</p>
+                <p>历史排行榜数量：${historyRecords.length}次</p>
+            `;
+            basicStats.innerHTML = basicStatsHTML;
+            
+            // 到班时间分析
+            if (records.length > 0) {
+                const sortedRecords = [...records].sort((a, b) => new Date(a.time) - new Date(b.time));
+                const earliestTime = new Date(sortedRecords[0].time);
+                const latestTime = new Date(sortedRecords[sortedRecords.length - 1].time);
+                const timeDiff = (latestTime - earliestTime) / 1000 / 60; // 转换为分钟
+                
+                let timeStatsHTML = `
+                    <p>最早到班时间：${formatTime(earliestTime.toISOString())}</p>
+                    <p>最晚到班时间：${formatTime(latestTime.toISOString())}</p>
+                    <p>到班时间跨度：${timeDiff.toFixed(1)}分钟</p>
+                `;
+                timeStats.innerHTML = timeStatsHTML;
+            } else {
+                timeStats.innerHTML = '<p>暂无到班数据</p>';
+            }
+            
+            // 学生活跃度分析
+            if (historyRecords.length > 0) {
+                // 统计每个学生的上榜次数
+                const studentActivity = {};
+                
+                historyRecords.forEach(history => {
+                    history.records.forEach(record => {
+                        const studentId = record.studentId || record.name;
+                        if (!studentActivity[studentId]) {
+                            studentActivity[studentId] = 0;
+                        }
+                        studentActivity[studentId]++;
+                    });
+                });
+                
+                // 转换为数组并排序
+                const sortedActivity = Object.entries(studentActivity)
+                    .map(([studentId, count]) => ({ studentId, count }))
+                    .sort((a, b) => b.count - a.count);
+                
+                let activityStatsHTML = '<h4>学生上榜次数Top 5：</h4>';
+                sortedActivity.slice(0, 5).forEach((item, index) => {
+                    const studentName = getStudentNameById(item.studentId);
+                    activityStatsHTML += `<p>${index + 1}. ${studentName}（${item.studentId}）：${item.count}次</p>`;
+                });
+                activityStats.innerHTML = activityStatsHTML;
+            } else {
+                activityStats.innerHTML = '<p>暂无历史数据</p>';
+            }
+        }
+        
+        // 加载保存的主题
+        loadTheme();
+        
+        // 作者彩蛋功能
+        let eggClickCount = 0;
+        
+        // 创建作者信息元素
+        const authorEgg = document.createElement('div');
+        authorEgg.style.cssText = `
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            font-size: 12px;
+            color: #999;
+            cursor: pointer;
+            z-index: 100;
+            padding: 5px 10px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            transition: all 0.3s ease;
+            text-align: center;
+        `;
+        authorEgg.textContent = '作者：付泽宜';
+        
+        // 将作者信息添加到容器内部，而不是body
+        const container = document.querySelector('.container');
+        if (container) {
+            container.appendChild(authorEgg);
+        } else {
+            document.body.appendChild(authorEgg);
+        }
+        
+        // 创建彩蛋图片容器
+        const eggImagesContainer = document.createElement('div');
+        eggImagesContainer.id = 'egg-images-container';
+        eggImagesContainer.style.cssText = `
+            display: none;
+            position: absolute;
+            bottom: 50px;
+            right: 10px;
+            z-index: 200;
+            background-color: white;
+            border-radius: 10px;
+            padding: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            max-width: 300px;
+        `;
+        
+        // 将彩蛋图片容器添加到容器内部
+        if (container) {
+            container.appendChild(eggImagesContainer);
+        } else {
+            document.body.appendChild(eggImagesContainer);
+        }
+        
+        // 创建彩蛋图片画廊
+        const eggGallery = document.createElement('div');
+        eggGallery.style.cssText = `
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            max-height: 400px;
+            overflow-y: auto;
+        `;
+        eggImagesContainer.appendChild(eggGallery);
+        
+        // 添加关闭按钮
+        const closeEggBtn = document.createElement('button');
+        closeEggBtn.textContent = '关闭';
+        closeEggBtn.style.cssText = `
+            margin-top: 10px;
+            padding: 5px 15px;
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        `;
+        closeEggBtn.addEventListener('click', () => {
+            eggImagesContainer.style.display = 'none';
+        });
+        eggImagesContainer.appendChild(closeEggBtn);
+        
+        // 作者信息点击事件
+        authorEgg.addEventListener('click', () => {
+            eggClickCount++;
+            
+            // 显示彩蛋图片容器
+            if (eggImagesContainer.style.display === 'none' || eggImagesContainer.style.display === '') {
+                eggImagesContainer.style.display = 'block';
+                
+                // 加载彩蛋图片
+                loadEggImages();
+            } else {
+                eggImagesContainer.style.display = 'none';
+            }
+        });
+        
+        // 鼠标悬停效果
+        authorEgg.addEventListener('mouseenter', () => {
+            authorEgg.style.transform = 'scale(1.05)';
+            authorEgg.style.backgroundColor = 'rgba(255, 255, 255, 1)';
+        });
+        
+        authorEgg.addEventListener('mouseleave', () => {
+            authorEgg.style.transform = 'scale(1)';
+            authorEgg.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+        });
+        
+        // 加载彩蛋图片
+        function loadEggImages() {
+            // 清空画廊
+            eggGallery.innerHTML = '';
+            
+            // 本地图片列表
+            const localImages = [
+              
+            ];
+            
+            // 遍历本地图片
+            localImages.forEach((imagePath, index) => {
+                const imageWrapper = document.createElement('div');
+                imageWrapper.style.cssText = `
+                    position: relative;
+                    border-radius: 8px;
+                    overflow: hidden;
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                `;
+                
+                const img = document.createElement('img');
+                img.src = imagePath;
+                img.alt = `彩蛋图片 ${index + 1}`;
+                img.style.cssText = `
+                    width: 100%;
+                    height: 150px;
+                    object-fit: cover;
+                    transition: transform 0.3s ease;
+                    cursor: pointer;
+                `;
+                
+                // 图片点击放大效果
+                img.addEventListener('click', () => {
+                    if (img.style.transform === 'scale(1.1)') {
+                        img.style.transform = 'scale(1)';
+                    } else {
+                        img.style.transform = 'scale(1.1)';
+                    }
+                });
+                
+                imageWrapper.appendChild(img);
+                eggGallery.appendChild(imageWrapper);
+            });
+        }
+        
+        // 为深色主题添加样式
+        const style = document.createElement('style');
+        style.textContent = `
+            .dark-theme .input-section {
+                background-color: #1e1e1e;
+                color: #e0e0e0;
+            }
+            .dark-theme .display-section {
+                background-color: #1e1e1e;
+                color: #e0e0e0;
+            }
+            .dark-theme table {
+                background-color: #2c2c2c;
+                color: #e0e0e0;
+            }
+            .dark-theme th {
+                background-color: #3c3c3c;
+                color: #e0e0e0;
+            }
+            .dark-theme tr:hover {
+                background-color: #3c3c3c;
+            }
+            .dark-theme .student-item {
+                background-color: #3c3c3c;
+                color: #e0e0e0;
+            }
+            .dark-theme .modal-content {
+                background-color: #2c2c2c;
+                color: #e0e0e0;
+            }
+            .dark-theme #delete-reason {
+                background-color: #3c3c3c;
+                color: #e0e0e0;
+                border-color: #555;
+            }
+            .dark-theme .audio-player {
+                background-color: #2c2c2c;
+                color: #e0e0e0;
+            }
+            .dark-theme .history-item {
+                background-color: #2c2c2c;
+                color: #e0e0e0;
+            }
+            .dark-theme .ranking-item {
+                background-color: #2c2c2c;
+                color: #e0e0e0;
+                border-color: #444;
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
