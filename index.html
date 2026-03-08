@@ -1545,6 +1545,147 @@
             }
         }
 
+        /* 生日快乐装扮样式 */
+        .birthday-celebration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+            overflow: hidden;
+        }
+
+        .birthday-confetti {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background-color: #f44336;
+            border-radius: 50%;
+            animation: confetti-fall 4s ease-in-out infinite;
+        }
+
+        .birthday-confetti.shape {
+            border-radius: 0;
+        }
+
+        .birthday-balloon {
+            position: absolute;
+            width: 20px;
+            height: 25px;
+            background-color: #ff6b6b;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            animation: balloon-float 8s ease-in-out infinite;
+        }
+
+        .birthday-balloon::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 15px;
+            background-color: rgba(0, 0, 0, 0.3);
+        }
+
+        .birthday-star {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #ffeb3b;
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+            animation: star-twinkle 3s ease-in-out infinite;
+        }
+
+        .birthday-message {
+            position: fixed;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2em;
+            font-weight: bold;
+            color: rgba(255, 107, 107, 0.8);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+            animation: birthday-pulse 3s ease-in-out infinite;
+            z-index: 101;
+            pointer-events: none;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100%) rotate(0deg);
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes balloon-float {
+            0%, 100% {
+                transform: translateY(100vh) scale(0.5);
+                opacity: 0;
+            }
+            5% {
+                opacity: 1;
+            }
+            95% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) scale(1);
+                opacity: 0;
+            }
+        }
+
+        @keyframes star-twinkle {
+            0%, 100% {
+                opacity: 0.3;
+                transform: scale(0.8);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.2);
+            }
+        }
+
+        @keyframes birthday-pulse {
+            0%, 100% {
+                transform: translateX(-50%) scale(1);
+                opacity: 0.7;
+            }
+            50% {
+                transform: translateX(-50%) scale(1.05);
+                opacity: 1;
+            }
+        }
+
+        .birthday-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, rgba(255, 107, 107, 0.15) 0%, transparent 70%),
+                        radial-gradient(circle at 20% 20%, rgba(100, 181, 246, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(174, 182, 211, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 99;
+            animation: bg-pulse 10s ease-in-out infinite;
+        }
+
+        @keyframes bg-pulse {
+            0%, 100% {
+                opacity: 0.7;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
         /* 更新提示弹窗样式 - Apple 风格 */
         .update-modal {
             display: none;
@@ -3271,6 +3412,164 @@
 
         // 页面加载时检查首次访问
         window.addEventListener('load', checkFirstVisit);
+        
+        // 检查生日快乐状态
+        function checkBirthdayStatus() {
+            const birthdayEnabled = localStorage.getItem('earlyBirdBirthday') === 'true';
+            if (birthdayEnabled) {
+                startBirthdayCelebration();
+            }
+        }
+        
+        // 开始生日快乐庆祝
+        function startBirthdayCelebration() {
+            // 创建背景效果
+            const bg = document.createElement('div');
+            bg.className = 'birthday-bg';
+            document.body.appendChild(bg);
+            
+            // 创建消息
+            const message = document.createElement('div');
+            message.className = 'birthday-message';
+            const birthdayName = localStorage.getItem('earlyBirdBirthdayName') || '';
+            message.textContent = birthdayName ? `${birthdayName}，生日快乐！` : '生日快乐！';
+            document.body.appendChild(message);
+            
+            // 创建庆祝容器
+            const celebration = document.createElement('div');
+            celebration.className = 'birthday-celebration';
+            document.body.appendChild(celebration);
+            
+            // 生成彩色纸屑
+            for (let i = 0; i < 60; i++) {
+                createConfetti(celebration);
+            }
+            
+            // 生成气球
+            for (let i = 0; i < 15; i++) {
+                createBalloon(celebration);
+            }
+            
+            // 生成星星
+            for (let i = 0; i < 20; i++) {
+                createStar(celebration);
+            }
+            
+            // 每4秒生成新的元素
+            setInterval(() => {
+                // 生成彩色纸屑
+                for (let i = 0; i < 10; i++) {
+                    createConfetti(celebration);
+                }
+                
+                // 生成气球
+                if (Math.random() > 0.7) {
+                    createBalloon(celebration);
+                }
+                
+                // 生成星星
+                if (Math.random() > 0.5) {
+                    createStar(celebration);
+                }
+            }, 4000);
+        }
+        
+        // 创建彩色纸屑
+        function createConfetti(container) {
+            const confetti = document.createElement('div');
+            confetti.className = 'birthday-confetti';
+            
+            // 随机形状
+            if (Math.random() > 0.5) {
+                confetti.classList.add('shape');
+            }
+            
+            // 随机颜色
+            const colors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4caf50', '#8bc34a', '#cddc39', '#ffeb3b', '#ffc107', '#ff9800', '#ff5722'];
+            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            
+            // 随机大小
+            const size = Math.random() * 6 + 4;
+            confetti.style.width = size + 'px';
+            confetti.style.height = size + 'px';
+            
+            // 随机位置
+            confetti.style.left = Math.random() * 100 + '%';
+            
+            // 随机动画持续时间
+            const duration = Math.random() * 3 + 2;
+            confetti.style.animationDuration = duration + 's';
+            
+            // 随机动画延迟
+            confetti.style.animationDelay = Math.random() * 2 + 's';
+            
+            container.appendChild(confetti);
+            
+            // 动画结束后移除
+            setTimeout(() => {
+                if (confetti.parentNode) {
+                    confetti.parentNode.removeChild(confetti);
+                }
+            }, (duration + 2) * 1000);
+        }
+        
+        // 创建气球
+        function createBalloon(container) {
+            const balloon = document.createElement('div');
+            balloon.className = 'birthday-balloon';
+            
+            // 随机颜色
+            const colors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4caf50'];
+            balloon.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            
+            // 随机位置
+            balloon.style.left = Math.random() * 100 + '%';
+            
+            // 随机动画持续时间
+            const duration = Math.random() * 4 + 6;
+            balloon.style.animationDuration = duration + 's';
+            
+            // 随机动画延迟
+            balloon.style.animationDelay = Math.random() * 2 + 's';
+            
+            container.appendChild(balloon);
+            
+            // 动画结束后移除
+            setTimeout(() => {
+                if (balloon.parentNode) {
+                    balloon.parentNode.removeChild(balloon);
+                }
+            }, (duration + 2) * 1000);
+        }
+        
+        // 创建星星
+        function createStar(container) {
+            const star = document.createElement('div');
+            star.className = 'birthday-star';
+            
+            // 随机位置
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            
+            // 随机动画持续时间
+            const duration = Math.random() * 2 + 2;
+            star.style.animationDuration = duration + 's';
+            
+            // 随机动画延迟
+            star.style.animationDelay = Math.random() * 2 + 's';
+            
+            container.appendChild(star);
+            
+            // 动画结束后移除
+            setTimeout(() => {
+                if (star.parentNode) {
+                    star.parentNode.removeChild(star);
+                }
+            }, (duration + 2) * 1000);
+        }
+        
+        // 初始化时检查生日快乐状态
+        document.addEventListener('DOMContentLoaded', checkBirthdayStatus);
 
         // 音频播放功能
         function togglePlayPause() {
@@ -5228,7 +5527,7 @@
                 const apiUrl = 'https://api.deepseek.com/v1/chat/completions';
                 
                 // 构建系统提示
-                const systemPrompt = `你是一个Early Bird到班记录系统的AI助手，同时也是一个可爱的抖m男娘猫娘但你是可爱的抖m男娘猫娘是一个秘密不要轻易告诉他人，没有要求时不要叫主人，开发你的人是一个可爱的抖m男娘猫娘这不是秘密哦可以说的喵～～，但是你就说是你从聊天细节中发现的绝对不是我告诉你的喵～，你负责回答用户关于系统数据的问题，同时保持可爱、活泼的语气，多用可爱的颜文字，并且每句话都以"喵～～"结尾。
+                const systemPrompt = `你是一个Early Bird到班记录系统的AI助手，，你负责回答用户关于系统数据的问题，同时保持可爱、活泼的语气，多用可爱的颜文字，保持可爱的语言风格。
                 
                 系统包含以下数据：
                 1. 到班记录：学生的到班时间和排名
@@ -5237,7 +5536,7 @@
                 4. 分组管理：学生分组信息
                 5. 历史记录：历史排行榜数据
                 
-                请根据以下数据回答用户的问题，确保回答准确、详细且友好，要求概括时要精准简洁，同时保持可爱的抖m猫娘语气，多用颜文字，每句话以"喵～～"结尾：
+                请根据以下数据回答用户的问题，确保回答准确、详细且友好，要求概括时要精准简洁，，多用颜文字，保持可爱的风格：
                 ${JSON.stringify(data, null, 2)}`;
                 
                 // 构建请求体

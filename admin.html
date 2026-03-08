@@ -794,6 +794,10 @@
             <button id="export-btn">导出数据</button>
             <button id="theme-btn">切换主题</button>
             <button id="stats-btn">数据统计</button>
+            <div style="display: flex; align-items: center; margin-top: 10px;">
+                <input type="text" id="birthday-name" placeholder="输入过生日人的名字" style="margin-right: 10px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                <button id="birthday-btn">开启生日快乐</button>
+            </div>
         </div>
         
         <!-- 删除原因输入模态框 -->
@@ -2050,6 +2054,46 @@
             }
         `;
         document.head.appendChild(style);
+        
+        // 生日快乐装扮控制
+        const birthdayBtn = document.getElementById('birthday-btn');
+        if (birthdayBtn) {
+            birthdayBtn.addEventListener('click', toggleBirthdayCelebration);
+            updateBirthdayButton();
+        }
+        
+        // 切换生日快乐庆祝
+        function toggleBirthdayCelebration() {
+            const currentStatus = localStorage.getItem('earlyBirdBirthday') === 'true';
+            const newStatus = !currentStatus;
+            
+            // 保存过生日人的名字
+            const birthdayNameInput = document.getElementById('birthday-name');
+            if (birthdayNameInput) {
+                const birthdayName = birthdayNameInput.value.trim();
+                localStorage.setItem('earlyBirdBirthdayName', birthdayName);
+            }
+            
+            localStorage.setItem('earlyBirdBirthday', newStatus);
+            updateBirthdayButton();
+            showMessage(newStatus ? '生日快乐装扮已开启！' : '生日快乐装扮已关闭！', 'success');
+        }
+        
+        // 更新生日按钮文本
+        function updateBirthdayButton() {
+            const birthdayBtn = document.getElementById('birthday-btn');
+            if (birthdayBtn) {
+                const isEnabled = localStorage.getItem('earlyBirdBirthday') === 'true';
+                birthdayBtn.textContent = isEnabled ? '关闭生日快乐' : '开启生日快乐';
+                if (isEnabled) {
+                    birthdayBtn.style.backgroundColor = '#f44336';
+                    birthdayBtn.style.boxShadow = '0 4px 12px rgba(244, 67, 54, 0.3)';
+                } else {
+                    birthdayBtn.style.backgroundColor = '#42a5f5';
+                    birthdayBtn.style.boxShadow = '0 4px 12px rgba(66, 165, 245, 0.3)';
+                }
+            }
+        }
     </script>
 </body>
 </html>
